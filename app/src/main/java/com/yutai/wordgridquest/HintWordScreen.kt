@@ -7,17 +7,20 @@ import android.content.Intent
 import android.widget.Toast
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Column
+import androidx.compose.foundation.layout.FlowRow
+import androidx.compose.foundation.layout.PaddingValues
 import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
+import androidx.compose.foundation.layout.size
+import androidx.compose.foundation.shape.CircleShape
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material3.Button
 import androidx.compose.material3.Card
 import androidx.compose.material3.CardDefaults
 import androidx.compose.material3.OutlinedButton
-import androidx.compose.material3.OutlinedTextField
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.getValue
@@ -32,13 +35,14 @@ import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
+import androidx.compose.material3.ButtonDefaults
 
 @Composable
 fun HintWordScreen(
     onBackClick: () -> Unit
 ) {
     var questionIndex by remember { mutableIntStateOf(0) }
-    var userInput by remember { mutableStateOf("") }
+    var selectedAnswer by remember { mutableStateOf("") }
     var resultMessage by remember { mutableStateOf("") }
     var score by remember { mutableIntStateOf(0) }
     var correctCount by remember { mutableIntStateOf(0) }
@@ -59,7 +63,7 @@ fun HintWordScreen(
             ),
             onPlayAgainClick = {
                 questionIndex = 0
-                userInput = ""
+                selectedAnswer = ""
                 resultMessage = ""
                 score = 0
                 correctCount = 0
@@ -123,30 +127,32 @@ fun HintWordScreen(
                 Spacer(modifier = Modifier.height(14.dp))
 
                 Text(
-                    text = "請輸入缺少的字母",
+                    text = "請點選缺少的字母",
                     fontSize = 16.sp
                 )
 
-                Spacer(modifier = Modifier.height(12.dp))
+                Spacer(modifier = Modifier.height(10.dp))
 
-                OutlinedTextField(
-                    value = userInput,
-                    onValueChange = {
-                        userInput = it.uppercase().take(1)
+                Text(
+                    text = if (selectedAnswer.isEmpty()) {
+                        "尚未選擇"
+                    } else {
+                        "目前選擇：$selectedAnswer"
                     },
-                    label = {
-                        Text(text = "答案")
-                    },
-                    singleLine = true,
-                    modifier = Modifier.fillMaxWidth()
+                    fontSize = 18.sp,
+                    fontWeight = FontWeight.Bold
                 )
 
                 Spacer(modifier = Modifier.height(16.dp))
 
-                Button(
-                    onClick = {
+                AlphabetButtonGrid(
+                    selectedAnswer = selectedAnswer,
+                    hasAnswered = hasAnswered,
+                    onLetterClick = { letter ->
                         if (!hasAnswered) {
-                            if (userInput == question.missingAnswer) {
+                            selectedAnswer = letter
+
+                            if (letter == question.missingAnswer) {
                                 resultMessage = "答對了！${question.word} = ${question.meaning}"
                                 score += 10
                                 correctCount += 1
@@ -158,20 +164,17 @@ fun HintWordScreen(
 
                             hasAnswered = true
                         }
-                    },
-                    modifier = Modifier.fillMaxWidth()
-                ) {
-                    Text(text = "檢查答案")
-                }
+                    }
+                )
 
-                Spacer(modifier = Modifier.height(12.dp))
+                Spacer(modifier = Modifier.height(16.dp))
 
                 OutlinedButton(
                     onClick = {
-                        userInput = ""
+                        selectedAnswer = ""
                         resultMessage = ""
-                        hasAnswered = false
                     },
+                    enabled = !hasAnswered,
                     modifier = Modifier.fillMaxWidth()
                 ) {
                     Text(text = "重新作答")
@@ -183,13 +186,14 @@ fun HintWordScreen(
                     onClick = {
                         if (questionIndex < totalQuestions - 1) {
                             questionIndex += 1
-                            userInput = ""
+                            selectedAnswer = ""
                             resultMessage = ""
                             hasAnswered = false
                         } else {
                             showResult = true
                         }
                     },
+                    enabled = hasAnswered,
                     modifier = Modifier.fillMaxWidth()
                 ) {
                     Text(
@@ -235,6 +239,45 @@ fun HintWordScreen(
             modifier = Modifier.fillMaxWidth()
         ) {
             Text(text = "返回模式選擇")
+        }
+    }
+}
+
+@Composable
+fun AlphabetButtonGrid(
+    selectedAnswer: String,
+    hasAnswered: Boolean,
+    onLetterClick: (String) -> Unit
+) {
+    val alphabetLetters = ('A'..'Z').map { it.toString() }
+
+    FlowRow(
+        modifier = Modifier.fillMaxWidth(),
+        horizontalArrangement = Arrangement.Center,
+        verticalArrangement = Arrangement.spacedBy(8.dp)
+    ) {
+        alphabetLetters.forEach { letter ->
+            Button(
+                onClick = {
+                    onLetterClick(letter)
+                },
+                enabled = !hasAnswered,
+                contentPadding = ButtonDefaults.ContentPadding,
+                modifier = Modifier
+                    .padding(horizontal = 4.dp)
+                    .size(44.dp)
+            ) {
+                Text(
+                    text = letter,
+                    fontSize = 16.sp,
+                    fontWeight = if (selectedAnswer == letter) {
+                        FontWeight.Bold
+                    } else {
+                        FontWeight.SemiBold
+                    },
+                    textAlign = TextAlign.Center
+                )
+            }
         }
     }
 }
