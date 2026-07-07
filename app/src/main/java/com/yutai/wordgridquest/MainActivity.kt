@@ -69,40 +69,6 @@ class MainActivity : ComponentActivity() {
     }
 }
 
-
-val hintWordQuestions = listOf(
-    HintWordQuestion(
-        word = "APPLE",
-        meaning = "蘋果",
-        clue = "A _ P L E",
-        missingAnswer = "P"
-    ),
-    HintWordQuestion(
-        word = "BOOK",
-        meaning = "書",
-        clue = "B _ O K",
-        missingAnswer = "O"
-    ),
-    HintWordQuestion(
-        word = "CAT",
-        meaning = "貓",
-        clue = "C _ T",
-        missingAnswer = "A"
-    ),
-    HintWordQuestion(
-        word = "DOG",
-        meaning = "狗",
-        clue = "D _ G",
-        missingAnswer = "O"
-    ),
-    HintWordQuestion(
-        word = "GAME",
-        meaning = "遊戲",
-        clue = "G A _ E",
-        missingAnswer = "M"
-    )
-)
-
 @Composable
 fun WordGridQuestApp() {
     var currentScreen by remember { mutableStateOf(Screen.HOME) }
@@ -141,110 +107,6 @@ fun WordGridQuestApp() {
         )
     }
 }
-
-@Composable
-fun HomeScreen(
-    onStartClick: () -> Unit,
-    onRankingClick: () -> Unit,
-    onStudyRecordClick: () -> Unit
-) {
-    Column(
-        modifier = Modifier
-            .fillMaxSize()
-            .padding(24.dp),
-        verticalArrangement = Arrangement.Center,
-        horizontalAlignment = Alignment.CenterHorizontally
-    ) {
-        Text(
-            text = "Word Grid Quest",
-            fontSize = 34.sp,
-            fontWeight = FontWeight.Bold,
-            textAlign = TextAlign.Center
-        )
-
-        Spacer(modifier = Modifier.height(8.dp))
-
-        Text(
-            text = "英文單字牌陣",
-            fontSize = 20.sp,
-            textAlign = TextAlign.Center
-        )
-
-        Spacer(modifier = Modifier.height(36.dp))
-
-        Button(
-            onClick = onStartClick,
-            modifier = Modifier.fillMaxWidth()
-        ) {
-            Text(text = "開始遊戲")
-        }
-
-        Spacer(modifier = Modifier.height(12.dp))
-
-        OutlinedButton(
-            onClick = onRankingClick,
-            modifier = Modifier.fillMaxWidth()
-        ) {
-            Text(text = "排行榜")
-        }
-
-        Spacer(modifier = Modifier.height(12.dp))
-
-        OutlinedButton(
-            onClick = onStudyRecordClick,
-            modifier = Modifier.fillMaxWidth()
-        ) {
-            Text(text = "學習紀錄")
-        }
-    }
-}
-
-@Composable
-fun ModeSelectScreen(
-    onLetterTileClick: () -> Unit,
-    onHintWordClick: () -> Unit,
-    onBackClick: () -> Unit
-) {
-    Column(
-        modifier = Modifier
-            .fillMaxSize()
-            .padding(24.dp),
-        verticalArrangement = Arrangement.Center,
-        horizontalAlignment = Alignment.CenterHorizontally
-    ) {
-        Text(
-            text = "選擇遊戲模式",
-            fontSize = 28.sp,
-            fontWeight = FontWeight.Bold
-        )
-
-        Spacer(modifier = Modifier.height(28.dp))
-
-        GameModeCard(
-            title = "模式一：字母牌陣",
-            description = "從彩色堆疊字母牌中找出可組成英文單字的組合，成功拼字後即可消除。",
-            onClick = onLetterTileClick
-        )
-
-        Spacer(modifier = Modifier.height(12.dp))
-
-        GameModeCard(
-            title = "模式二：提示拼字",
-            description = "根據中文提示與部分字母線索，補齊正確英文單字。",
-            onClick = onHintWordClick
-        )
-
-        Spacer(modifier = Modifier.height(28.dp))
-
-        OutlinedButton(
-            onClick = onBackClick,
-            modifier = Modifier.fillMaxWidth()
-        ) {
-            Text(text = "返回首頁")
-        }
-    }
-}
-
 
 @Composable
 fun LetterTileScreen(
@@ -811,6 +673,7 @@ fun LetterTileResultScreen(
         }
     }
 }
+
 @Composable
 fun HintWordScreen(
     onBackClick: () -> Unit
@@ -1187,74 +1050,4 @@ fun shareResult(
     )
 
     context.startActivity(shareIntent)
-}
-
-@Composable
-fun GameModeCard(
-    title: String,
-    description: String,
-    onClick: () -> Unit
-) {
-    Card(
-        onClick = onClick,
-        modifier = Modifier.fillMaxWidth(),
-        shape = RoundedCornerShape(16.dp),
-        elevation = CardDefaults.cardElevation(defaultElevation = 4.dp)
-    ) {
-        Column(
-            modifier = Modifier.padding(18.dp)
-        ) {
-            Text(
-                text = title,
-                fontSize = 20.sp,
-                fontWeight = FontWeight.Bold
-            )
-
-            Spacer(modifier = Modifier.height(6.dp))
-
-            Text(
-                text = description,
-                fontSize = 15.sp
-            )
-        }
-    }
-}
-
-@Composable
-fun SimplePageScreen(
-    title: String,
-    content: String,
-    onBackClick: () -> Unit
-) {
-    Column(
-        modifier = Modifier
-            .fillMaxSize()
-            .padding(24.dp),
-        verticalArrangement = Arrangement.Center,
-        horizontalAlignment = Alignment.CenterHorizontally
-    ) {
-        Text(
-            text = title,
-            fontSize = 30.sp,
-            fontWeight = FontWeight.Bold,
-            textAlign = TextAlign.Center
-        )
-
-        Spacer(modifier = Modifier.height(20.dp))
-
-        Text(
-            text = content,
-            fontSize = 17.sp,
-            textAlign = TextAlign.Center
-        )
-
-        Spacer(modifier = Modifier.height(32.dp))
-
-        OutlinedButton(
-            onClick = onBackClick,
-            modifier = Modifier.fillMaxWidth()
-        ) {
-            Text(text = "返回")
-        }
-    }
 }

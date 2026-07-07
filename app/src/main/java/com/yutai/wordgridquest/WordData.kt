@@ -1,5 +1,36 @@
 package com.yutai.wordgridquest
-
+val hintWordQuestions = listOf(
+    HintWordQuestion(
+        word = "APPLE",
+        meaning = "蘋果",
+        clue = "A _ P L E",
+        missingAnswer = "P"
+    ),
+    HintWordQuestion(
+        word = "BOOK",
+        meaning = "書",
+        clue = "B _ O K",
+        missingAnswer = "O"
+    ),
+    HintWordQuestion(
+        word = "CAT",
+        meaning = "貓",
+        clue = "C _ T",
+        missingAnswer = "A"
+    ),
+    HintWordQuestion(
+        word = "DOG",
+        meaning = "狗",
+        clue = "D _ G",
+        missingAnswer = "O"
+    ),
+    HintWordQuestion(
+        word = "GAME",
+        meaning = "遊戲",
+        clue = "G A _ E",
+        missingAnswer = "M"
+    )
+)
 val validWords = mapOf(
     // 3 個字母
     "CAT" to "貓",
