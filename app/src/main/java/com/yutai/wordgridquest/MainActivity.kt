@@ -157,19 +157,43 @@ val hintWordQuestions = listOf(
 )
 
 val validWords = mapOf(
+    // 3 個字母
     "CAT" to "貓",
     "DOG" to "狗",
+    "SUN" to "太陽",
+    "SET" to "設置",
+    "RUN" to "跑",
+    "RED" to "紅色",
+    "BED" to "床",
+    "CAR" to "車",
+    "BUS" to "公車",
+    "PEN" to "筆",
+    "EGG" to "蛋",
+    "MAP" to "地圖",
+    "BAT" to "蝙蝠／球棒",
+    "BOX" to "盒子",
+    "CUP" to "杯子",
+
+    // 4 個字母
     "BOOK" to "書",
-    "APPLE" to "蘋果",
     "GAME" to "遊戲",
     "FISH" to "魚",
     "BIRD" to "鳥",
-    "SUN" to "太陽",
     "MOON" to "月亮",
     "STAR" to "星星",
     "TREE" to "樹",
+    "MILK" to "牛奶",
+    "CAKE" to "蛋糕",
+    "HAND" to "手",
+    "FOOD" to "食物",
+    "RAIN" to "雨",
+
+    // 5 個字母
+    "APPLE" to "蘋果",
     "HOUSE" to "房子",
-    "SET" to "設置"
+    "MOUSE" to "老鼠",
+    "TABLE" to "桌子",
+    "CHAIR" to "椅子"
 )
 
 val tileSlots = listOf(
@@ -516,7 +540,7 @@ fun findHintResult(
                 .thenBy { it.col }
         )
 
-    validWords.forEach { entry ->
+    validWords.entries.shuffled().forEach { entry ->
         val word = entry.key
         val meaning = entry.value
         val usedTileIds = mutableListOf<Int>()
@@ -597,6 +621,7 @@ fun calculateWordScore(word: String): Int {
         else -> 150
     }
 }
+
 
 fun getLetterColor(letter: String): Color {
     return when (letter.uppercase()) {
