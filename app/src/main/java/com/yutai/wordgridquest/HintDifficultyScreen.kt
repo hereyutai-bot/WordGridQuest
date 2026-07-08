@@ -20,23 +20,43 @@ import androidx.compose.ui.unit.dp
 enum class HintGameDifficulty(
     val title: String,
     val description: String,
-    val secondsPerQuestion: Int?
+    val secondsPerQuestion: Int?,
+    val clueMode: ClueMode
 ) {
-    Practice(
+    PRACTICE(
         title = "練習模式",
-        description = "不倒數，適合熟悉單字",
-        secondsPerQuestion = null
+        description = "少挖空，適合初學",
+        secondsPerQuestion = null,
+        clueMode = ClueMode.EASY
     ),
-    Challenge(
+
+    CHALLENGE(
         title = "挑戰模式",
-        description = "每題 15 秒",
-        secondsPerQuestion = 15
+        description = "中等挖空，難度適中",
+        secondsPerQuestion = null,
+        clueMode = ClueMode.NORMAL
     ),
-    Fast(
+
+    FAST(
         title = "快速模式",
-        description = "每題 10 秒",
-        secondsPerQuestion = 10
+        description = "多挖空，較有挑戰",
+        secondsPerQuestion = null,
+        clueMode = ClueMode.HARD
+    ),
+
+    HELL(
+        title = "地獄模式",
+        description = "完全不提示英文，只看中文意思",
+        secondsPerQuestion = null,
+        clueMode = ClueMode.HELL
     )
+}
+
+enum class ClueMode {
+    EASY,
+    NORMAL,
+    HARD,
+    HELL
 }
 
 @Composable
@@ -67,25 +87,34 @@ fun HintDifficultySelectScreen(
         Spacer(modifier = Modifier.height(32.dp))
 
         HintDifficultyButton(
-            title = HintGameDifficulty.Practice.title,
-            description = HintGameDifficulty.Practice.description,
-            onClick = { onSelectDifficulty(HintGameDifficulty.Practice) }
+            title = HintGameDifficulty.PRACTICE.title,
+            description = HintGameDifficulty.PRACTICE.description,
+            onClick = { onSelectDifficulty(HintGameDifficulty.PRACTICE) }
         )
 
         Spacer(modifier = Modifier.height(16.dp))
 
         HintDifficultyButton(
-            title = HintGameDifficulty.Challenge.title,
-            description = HintGameDifficulty.Challenge.description,
-            onClick = { onSelectDifficulty(HintGameDifficulty.Challenge) }
+            title = HintGameDifficulty.CHALLENGE.title,
+            description = HintGameDifficulty.CHALLENGE.description,
+            onClick = { onSelectDifficulty(HintGameDifficulty.CHALLENGE) }
         )
 
         Spacer(modifier = Modifier.height(16.dp))
 
         HintDifficultyButton(
-            title = HintGameDifficulty.Fast.title,
-            description = HintGameDifficulty.Fast.description,
-            onClick = { onSelectDifficulty(HintGameDifficulty.Fast) }
+            title = HintGameDifficulty.FAST.title,
+            description = HintGameDifficulty.FAST.description,
+            onClick = { onSelectDifficulty(HintGameDifficulty.FAST) }
+        )
+        Spacer(modifier = Modifier.height(14.dp))
+
+        HintDifficultyButton(
+            title = "地獄模式",
+            description = "不提示英文，只看中文意思作答",
+            onClick = {
+                onSelectDifficulty(HintGameDifficulty.HELL)
+            }
         )
 
         Spacer(modifier = Modifier.height(32.dp))

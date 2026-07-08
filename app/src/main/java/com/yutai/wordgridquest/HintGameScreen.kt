@@ -80,7 +80,15 @@ fun HintWordGameScreen(
 
     val totalQuestions = gameQuestions.size
     val currentQuestion = gameQuestions[currentIndex]
-    val correctAnswer = currentQuestion.missingAnswer.uppercase()
+    val currentClue = buildWordClue(
+        word = currentQuestion.word,
+        clueMode = difficulty.clueMode
+    )
+
+    val correctAnswer = buildMissingAnswer(
+        word = currentQuestion.word,
+        clueMode = difficulty.clueMode
+    ).uppercase()
 
     LaunchedEffect(
         currentIndex,
@@ -321,7 +329,11 @@ fun HintWordGameScreen(
                 Spacer(modifier = Modifier.height(4.dp))
 
                 Text(
-                    text = "拼字：${currentQuestion.clue}",
+                    text = if (difficulty.clueMode == ClueMode.HELL) {
+                        "拼字：不提示英文"
+                    } else {
+                        "拼字：$currentClue"
+                    },
                     style = MaterialTheme.typography.bodyLarge,
                     fontWeight = FontWeight.Bold
                 )
@@ -331,7 +343,7 @@ fun HintWordGameScreen(
         Spacer(modifier = Modifier.height(12.dp))
 
         HintAnswerSlots(
-            clue = currentQuestion.clue,
+            clue = currentClue,
             selectedAnswer = selectedAnswer
         )
 

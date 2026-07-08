@@ -161,15 +161,27 @@ fun buildHintQuestionsFromDictionary(): List<HintWordQuestion> {
             HintWordQuestion(
                 word = upperWord,
                 meaning = dictionaryWord.meaning,
-                clue = buildWordClue(upperWord),
-                missingAnswer = buildMissingAnswer(upperWord)
+                clue = buildWordClue(
+                    word = upperWord,
+                    clueMode = ClueMode.NORMAL
+                ),
+                missingAnswer = buildMissingAnswer(
+                    word = upperWord,
+                    clueMode = ClueMode.NORMAL
+                )
             )
         }
 }
 
-fun buildWordClue(word: String): String {
+fun buildWordClue(
+    word: String,
+    clueMode: ClueMode
+): String {
     val upperWord = word.uppercase()
-    val hiddenIndexes = getHiddenIndexes(upperWord)
+    val hiddenIndexes = getHiddenIndexes(
+        word = upperWord,
+        clueMode = clueMode
+    )
 
     return upperWord.mapIndexed { index, char ->
         if (index in hiddenIndexes) {
@@ -180,9 +192,15 @@ fun buildWordClue(word: String): String {
     }.joinToString("")
 }
 
-fun buildMissingAnswer(word: String): String {
+fun buildMissingAnswer(
+    word: String,
+    clueMode: ClueMode
+): String {
     val upperWord = word.uppercase()
-    val hiddenIndexes = getHiddenIndexes(upperWord)
+    val hiddenIndexes = getHiddenIndexes(
+        word = upperWord,
+        clueMode = clueMode
+    )
 
     return upperWord.mapIndexedNotNull { index, char ->
         if (index in hiddenIndexes) {
@@ -193,20 +211,58 @@ fun buildMissingAnswer(word: String): String {
     }.joinToString("")
 }
 
-fun getHiddenIndexes(word: String): Set<Int> {
+fun getHiddenIndexes(
+    word: String,
+    clueMode: ClueMode
+): Set<Int> {
+    if (word.length <= 1) {
+        return emptySet()
+    }
+
+    return when (clueMode) {
+        ClueMode.EASY -> getEasyHiddenIndexes(word)
+        ClueMode.NORMAL -> getNormalHiddenIndexes(word)
+        ClueMode.HARD -> getHardHiddenIndexes(word)
+        ClueMode.HELL -> word.indices.toSet()
+    }
+}
+
+fun getEasyHiddenIndexes(word: String): Set<Int> {
     return when (word.length) {
-        0, 1, 2 -> emptySet()
-
+        2 -> setOf(1)
         3 -> setOf(1)
+        4 -> setOf(2)
+        5 -> setOf(2)
+        6 -> setOf(2, 4)
+        7 -> setOf(2, 4)
+        else -> setOf(2, 4, 6)
+    }
+}
 
+fun getNormalHiddenIndexes(word: String): Set<Int> {
+    return when (word.length) {
+        2 -> setOf(1)
+        3 -> setOf(1)
         4 -> setOf(1, 2)
-
         5 -> setOf(1, 3)
-
         6 -> setOf(1, 3)
-
         7 -> setOf(1, 3, 5)
-
         else -> setOf(1, 3, 5)
+    }
+}
+
+fun getHardHiddenIndexes(word: String): Set<Int> {
+    return when (word.length) {
+        2 -> setOf(0, 1)
+        3 -> setOf(1, 2)
+        4 -> setOf(1, 2)
+        5 -> setOf(1, 2, 3)
+        6 -> setOf(1, 2, 3, 4)
+        7 -> setOf(1, 2, 3, 4, 5)
+        else -> word.indices
+            .filter { index ->
+                index != 0 && index != word.lastIndex
+            }
+            .toSet()
     }
 }
