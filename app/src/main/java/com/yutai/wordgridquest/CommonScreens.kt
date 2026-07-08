@@ -99,6 +99,14 @@ fun RankingScreen(
     records: List<RankingRecord>,
     onBackClick: () -> Unit
 ) {
+    val letterTileRecords = records
+        .filter { it.modeType == GameModeType.LETTER_TILE }
+        .sortedByDescending { it.score }
+
+    val hintWordRecords = records
+        .filter { it.modeType == GameModeType.HINT_WORD }
+        .sortedByDescending { it.score }
+
     Column(
         modifier = Modifier
             .fillMaxSize()
@@ -122,16 +130,17 @@ fun RankingScreen(
                 content = "之後完成遊戲後，會把高分紀錄顯示在這裡。"
             )
         } else {
-            records
-                .sortedByDescending { it.score }
-                .forEachIndexed { index, record ->
-                    RankingRecordCard(
-                        rank = index + 1,
-                        record = record
-                    )
+            RankingModeSection(
+                title = GameModeType.LETTER_TILE.displayName,
+                records = letterTileRecords
+            )
 
-                    Spacer(modifier = Modifier.height(12.dp))
-                }
+            Spacer(modifier = Modifier.height(20.dp))
+
+            RankingModeSection(
+                title = GameModeType.HINT_WORD.displayName,
+                records = hintWordRecords
+            )
         }
 
         Spacer(modifier = Modifier.height(24.dp))
@@ -148,10 +157,47 @@ fun RankingScreen(
 }
 
 @Composable
+private fun RankingModeSection(
+    title: String,
+    records: List<RankingRecord>
+) {
+    Text(
+        text = title,
+        fontSize = 22.sp,
+        fontWeight = FontWeight.Bold,
+        modifier = Modifier.fillMaxWidth()
+    )
+
+    Spacer(modifier = Modifier.height(10.dp))
+
+    if (records.isEmpty()) {
+        EmptyStateCard(
+            title = "尚無資料",
+            content = "此模式目前還沒有排行榜紀錄。"
+        )
+    } else {
+        records.forEachIndexed { index, record ->
+            RankingRecordCard(
+                rank = index + 1,
+                record = record
+            )
+
+            Spacer(modifier = Modifier.height(12.dp))
+        }
+    }
+}
+
+@Composable
 fun StudyRecordScreen(
     records: List<StudyRecord>,
     onBackClick: () -> Unit
 ) {
+    val letterTileRecords = records
+        .filter { it.modeType == GameModeType.LETTER_TILE }
+
+    val hintWordRecords = records
+        .filter { it.modeType == GameModeType.HINT_WORD }
+
     Column(
         modifier = Modifier
             .fillMaxSize()
@@ -175,11 +221,17 @@ fun StudyRecordScreen(
                 content = "之後完成遊戲後，會記錄分數、答題狀況與學習成果。"
             )
         } else {
-            records.forEach { record ->
-                StudyRecordCard(record = record)
+            StudyRecordModeSection(
+                title = GameModeType.LETTER_TILE.displayName,
+                records = letterTileRecords
+            )
 
-                Spacer(modifier = Modifier.height(12.dp))
-            }
+            Spacer(modifier = Modifier.height(20.dp))
+
+            StudyRecordModeSection(
+                title = GameModeType.HINT_WORD.displayName,
+                records = hintWordRecords
+            )
         }
 
         Spacer(modifier = Modifier.height(24.dp))
@@ -192,6 +244,34 @@ fun StudyRecordScreen(
         }
 
         Spacer(modifier = Modifier.height(24.dp))
+    }
+}
+
+@Composable
+private fun StudyRecordModeSection(
+    title: String,
+    records: List<StudyRecord>
+) {
+    Text(
+        text = title,
+        fontSize = 22.sp,
+        fontWeight = FontWeight.Bold,
+        modifier = Modifier.fillMaxWidth()
+    )
+
+    Spacer(modifier = Modifier.height(10.dp))
+
+    if (records.isEmpty()) {
+        EmptyStateCard(
+            title = "尚無資料",
+            content = "此模式目前還沒有學習紀錄。"
+        )
+    } else {
+        records.forEach { record ->
+            StudyRecordCard(record = record)
+
+            Spacer(modifier = Modifier.height(12.dp))
+        }
     }
 }
 

@@ -13,8 +13,9 @@ import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.platform.LocalContext
 import com.yutai.wordgridquest.ui.theme.WordGridQuestTheme
-import androidx.compose.runtime.LaunchedEffect
+
 class MainActivity : ComponentActivity() {
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
@@ -35,23 +36,27 @@ class MainActivity : ComponentActivity() {
 
 @Composable
 fun WordGridQuestApp() {
+    val context = LocalContext.current
+
     var currentScreen by remember { mutableStateOf(Screen.HOME) }
 
     var rankingRecords by remember {
-        mutableStateOf<List<RankingRecord>>(emptyList())
+        mutableStateOf(RecordStorage.loadRankingRecords(context))
     }
 
     var studyRecords by remember {
-        mutableStateOf<List<StudyRecord>>(emptyList())
+        mutableStateOf(RecordStorage.loadStudyRecords(context))
     }
 
     fun addLetterTileRecord(result: LetterTileGameResult) {
+        val playedAtText = RecordStorage.currentPlayedAtText()
+
         val rankingRecord = RankingRecord(
             playerName = "玩家",
             modeType = GameModeType.LETTER_TILE,
             score = result.score,
             detailText = "成功單字 ${result.successWordCount} 個，使用提示 ${result.hintUsedCount} / 3 次",
-            playedAtText = "本次遊玩"
+            playedAtText = playedAtText
         )
 
         val studyRecord = StudyRecord(
@@ -60,21 +65,29 @@ fun WordGridQuestApp() {
             correctCount = result.successWordCount,
             wrongCount = 0,
             skipCount = 0,
-            playedAtText = "本次遊玩",
+            playedAtText = playedAtText,
             note = "已消除 ${result.removedTileCount} 張，剩餘 ${result.remainingTileCount} 張"
         )
 
-        rankingRecords = rankingRecords + rankingRecord
-        studyRecords = studyRecords + studyRecord
+        val newRankingRecords = rankingRecords + rankingRecord
+        val newStudyRecords = studyRecords + studyRecord
+
+        rankingRecords = newRankingRecords
+        studyRecords = newStudyRecords
+
+        RecordStorage.saveRankingRecords(context, newRankingRecords)
+        RecordStorage.saveStudyRecords(context, newStudyRecords)
     }
 
     fun addHintWordRecord(result: GameResult) {
+        val playedAtText = RecordStorage.currentPlayedAtText()
+
         val rankingRecord = RankingRecord(
             playerName = "玩家",
             modeType = GameModeType.HINT_WORD,
             score = result.score,
             detailText = "答對 ${result.correctCount} 題，答錯 ${result.wrongCount} 題，跳過 ${result.skipCount} 題",
-            playedAtText = "本次遊玩"
+            playedAtText = playedAtText
         )
 
         val studyRecord = StudyRecord(
@@ -83,12 +96,18 @@ fun WordGridQuestApp() {
             correctCount = result.correctCount,
             wrongCount = result.wrongCount,
             skipCount = result.skipCount,
-            playedAtText = "本次遊玩",
+            playedAtText = playedAtText,
             note = "總題數 ${result.totalQuestions} 題"
         )
 
-        rankingRecords = rankingRecords + rankingRecord
-        studyRecords = studyRecords + studyRecord
+        val newRankingRecords = rankingRecords + rankingRecord
+        val newStudyRecords = studyRecords + studyRecord
+
+        rankingRecords = newRankingRecords
+        studyRecords = newStudyRecords
+
+        RecordStorage.saveRankingRecords(context, newRankingRecords)
+        RecordStorage.saveStudyRecords(context, newStudyRecords)
     }
 
     when (currentScreen) {
