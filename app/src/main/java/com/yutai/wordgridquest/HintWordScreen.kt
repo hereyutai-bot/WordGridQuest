@@ -40,6 +40,8 @@ import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import kotlinx.coroutines.delay
 
+private const val HINT_WORD_QUESTION_COUNT_PER_GAME = 10
+
 data class HintWordGameMode(
     val name: String,
     val description: String,
@@ -167,7 +169,11 @@ fun HintWordGameScreen(
 ) {
     var questionIndex by remember { mutableIntStateOf(0) }
     var questionList by remember {
-        mutableStateOf(hintWordQuestions.shuffled())
+        mutableStateOf(
+            hintWordQuestions
+                .shuffled()
+                .take(HINT_WORD_QUESTION_COUNT_PER_GAME)
+        )
     }
 
     var selectedAnswer by remember { mutableStateOf("") }
@@ -235,7 +241,9 @@ fun HintWordGameScreen(
             modeName = gameMode.name,
             onPlayAgainClick = {
                 questionIndex = 0
-                questionList = hintWordQuestions.shuffled()
+                questionList = hintWordQuestions
+                    .shuffled()
+                    .take(HINT_WORD_QUESTION_COUNT_PER_GAME)
                 selectedAnswer = ""
                 resultMessage = ""
                 score = 0
