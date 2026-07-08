@@ -134,4 +134,19 @@ object RecordStorage {
         val formatter = SimpleDateFormat("yyyy/MM/dd HH:mm", Locale.getDefault())
         return formatter.format(Date())
     }
+
+    fun clearRankingRecords(context: Context) {
+        context.getSharedPreferences(PREF_NAME, Context.MODE_PRIVATE)
+            .edit()
+            .remove(KEY_RANKING_RECORDS)
+            .apply()
+    }
+
+    fun clearStudyRecords(context: Context) {
+        context.getSharedPreferences(PREF_NAME, Context.MODE_PRIVATE)
+            .edit()
+            .remove(KEY_STUDY_RECORDS)
+            .apply()
+    }
 }
+

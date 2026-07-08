@@ -22,6 +22,13 @@ import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
+import androidx.compose.material3.AlertDialog
+import androidx.compose.material3.TextButton
+import androidx.compose.runtime.getValue
+import androidx.compose.runtime.mutableStateOf
+import androidx.compose.runtime.remember
+import androidx.compose.runtime.setValue
+
 
 @Composable
 fun GameModeCard(
@@ -97,8 +104,11 @@ fun SimplePageScreen(
 @Composable
 fun RankingScreen(
     records: List<RankingRecord>,
+    onClearRecords: () -> Unit,
     onBackClick: () -> Unit
 ) {
+    var showClearDialog by remember { mutableStateOf(false) }
+
     val letterTileRecords = records
         .filter { it.modeType == GameModeType.LETTER_TILE }
         .sortedByDescending { it.score }
@@ -145,6 +155,19 @@ fun RankingScreen(
 
         Spacer(modifier = Modifier.height(24.dp))
 
+        if (records.isNotEmpty()) {
+            OutlinedButton(
+                onClick = {
+                    showClearDialog = true
+                },
+                modifier = Modifier.fillMaxWidth()
+            ) {
+                Text(text = "清除排行榜")
+            }
+
+            Spacer(modifier = Modifier.height(12.dp))
+        }
+
         OutlinedButton(
             onClick = onBackClick,
             modifier = Modifier.fillMaxWidth()
@@ -153,6 +176,39 @@ fun RankingScreen(
         }
 
         Spacer(modifier = Modifier.height(24.dp))
+    }
+
+    if (showClearDialog) {
+        AlertDialog(
+            onDismissRequest = {
+                showClearDialog = false
+            },
+            title = {
+                Text(text = "清除排行榜")
+            },
+            text = {
+                Text(text = "確定要清除所有排行榜資料嗎？此動作無法復原。")
+            },
+            confirmButton = {
+                TextButton(
+                    onClick = {
+                        onClearRecords()
+                        showClearDialog = false
+                    }
+                ) {
+                    Text(text = "確定清除")
+                }
+            },
+            dismissButton = {
+                TextButton(
+                    onClick = {
+                        showClearDialog = false
+                    }
+                ) {
+                    Text(text = "取消")
+                }
+            }
+        )
     }
 }
 
@@ -190,8 +246,11 @@ private fun RankingModeSection(
 @Composable
 fun StudyRecordScreen(
     records: List<StudyRecord>,
+    onClearRecords: () -> Unit,
     onBackClick: () -> Unit
 ) {
+    var showClearDialog by remember { mutableStateOf(false) }
+
     val letterTileRecords = records
         .filter { it.modeType == GameModeType.LETTER_TILE }
 
@@ -236,6 +295,19 @@ fun StudyRecordScreen(
 
         Spacer(modifier = Modifier.height(24.dp))
 
+        if (records.isNotEmpty()) {
+            OutlinedButton(
+                onClick = {
+                    showClearDialog = true
+                },
+                modifier = Modifier.fillMaxWidth()
+            ) {
+                Text(text = "清除學習紀錄")
+            }
+
+            Spacer(modifier = Modifier.height(12.dp))
+        }
+
         OutlinedButton(
             onClick = onBackClick,
             modifier = Modifier.fillMaxWidth()
@@ -244,6 +316,39 @@ fun StudyRecordScreen(
         }
 
         Spacer(modifier = Modifier.height(24.dp))
+    }
+
+    if (showClearDialog) {
+        AlertDialog(
+            onDismissRequest = {
+                showClearDialog = false
+            },
+            title = {
+                Text(text = "清除學習紀錄")
+            },
+            text = {
+                Text(text = "確定要清除所有學習紀錄嗎？此動作無法復原。")
+            },
+            confirmButton = {
+                TextButton(
+                    onClick = {
+                        onClearRecords()
+                        showClearDialog = false
+                    }
+                ) {
+                    Text(text = "確定清除")
+                }
+            },
+            dismissButton = {
+                TextButton(
+                    onClick = {
+                        showClearDialog = false
+                    }
+                ) {
+                    Text(text = "取消")
+                }
+            }
+        )
     }
 }
 
