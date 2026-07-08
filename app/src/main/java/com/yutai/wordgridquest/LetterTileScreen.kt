@@ -44,10 +44,12 @@ import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import androidx.compose.ui.zIndex
+import androidx.compose.runtime.LaunchedEffect
 
 @Composable
 fun LetterTileScreen(
-    onBackClick: () -> Unit
+    onBackClick: () -> Unit,
+    onGameFinished: (LetterTileGameResult) -> Unit
 ) {
     var tiles by remember { mutableStateOf(createNewLetterTiles()) }
     var selectedWord by remember { mutableStateOf("") }
@@ -62,20 +64,30 @@ fun LetterTileScreen(
 
     var successWordCount by remember { mutableIntStateOf(0) }
     var showLetterResult by remember { mutableStateOf(false) }
+    var hasSavedResult by remember { mutableStateOf(false) }
 
     val remainingTileCount = tiles.count { !it.isRemoved }
     val removedTileCount = tiles.count { it.isRemoved }
     val hintUsedCount = 3 - hintCount
 
     if (showLetterResult) {
+        val finalResult = LetterTileGameResult(
+            score = score,
+            successWordCount = successWordCount,
+            removedTileCount = removedTileCount,
+            remainingTileCount = remainingTileCount,
+            hintUsedCount = hintUsedCount
+        )
+
+        LaunchedEffect(showLetterResult) {
+            if (!hasSavedResult) {
+                onGameFinished(finalResult)
+                hasSavedResult = true
+            }
+        }
+
         LetterTileResultScreen(
-            result = LetterTileGameResult(
-                score = score,
-                successWordCount = successWordCount,
-                removedTileCount = removedTileCount,
-                remainingTileCount = remainingTileCount,
-                hintUsedCount = hintUsedCount
-            ),
+            result = finalResult,
             onPlayAgainClick = {
                 tiles = createNewLetterTiles()
                 selectedWord = ""
@@ -88,6 +100,7 @@ fun LetterTileScreen(
                 showHintDialog = false
                 successWordCount = 0
                 showLetterResult = false
+                hasSavedResult = false
             },
             onBackClick = onBackClick
         )

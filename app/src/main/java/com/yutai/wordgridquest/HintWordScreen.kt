@@ -8,7 +8,8 @@ import androidx.compose.runtime.setValue
 
 @Composable
 fun HintWordScreen(
-    onBackToModeSelect: () -> Unit
+    onBackToModeSelect: () -> Unit,
+    onGameFinished: (GameResult) -> Unit
 ) {
     var selectedDifficulty by remember { mutableStateOf<HintGameDifficulty?>(null) }
 
@@ -24,7 +25,8 @@ fun HintWordScreen(
             difficulty = selectedDifficulty!!,
             onBackToDifficultySelect = {
                 selectedDifficulty = null
-            }
+            },
+            onGameFinished = onGameFinished
         )
     }
 }

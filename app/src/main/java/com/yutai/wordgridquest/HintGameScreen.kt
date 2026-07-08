@@ -39,7 +39,8 @@ import kotlinx.coroutines.delay
 @Composable
 fun HintWordGameScreen(
     difficulty: HintGameDifficulty,
-    onBackToDifficultySelect: () -> Unit
+    onBackToDifficultySelect: () -> Unit,
+    onGameFinished: (GameResult) -> Unit
 ) {
     val context = LocalContext.current
     val clipboardManager = LocalClipboardManager.current
@@ -59,6 +60,7 @@ fun HintWordGameScreen(
     var isAnswered by remember { mutableStateOf(false) }
     var isGameFinished by remember { mutableStateOf(false) }
     var isPaused by remember { mutableStateOf(false) }
+    var hasSavedResult by remember { mutableStateOf(false) }
 
     var answerFeedback by remember { mutableStateOf("") }
 
@@ -107,6 +109,21 @@ fun HintWordGameScreen(
     }
 
     if (isGameFinished) {
+        val finalResult = GameResult(
+            score = score,
+            correctCount = correctCount,
+            wrongCount = wrongCount,
+            skipCount = skipCount,
+            totalQuestions = totalQuestions
+        )
+
+        LaunchedEffect(isGameFinished) {
+            if (!hasSavedResult) {
+                onGameFinished(finalResult)
+                hasSavedResult = true
+            }
+        }
+
         HintWordResultScreen(
             difficulty = difficulty,
             score = score,
@@ -126,6 +143,7 @@ fun HintWordGameScreen(
                 isAnswered = false
                 isGameFinished = false
                 isPaused = false
+                hasSavedResult = false
                 answerFeedback = ""
                 timeLeft = difficulty.secondsPerQuestion ?: 0
                 questionResults.clear()
