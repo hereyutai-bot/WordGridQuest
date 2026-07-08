@@ -1,5 +1,6 @@
 package com.yutai.wordgridquest
 
+import android.content.Intent
 import androidx.compose.foundation.background
 import androidx.compose.foundation.border
 import androidx.compose.foundation.clickable
@@ -35,6 +36,9 @@ import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.alpha
 import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.platform.LocalClipboardManager
+import androidx.compose.ui.platform.LocalContext
+import androidx.compose.ui.text.AnnotatedString
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.unit.dp
@@ -127,46 +131,55 @@ fun LetterTileScreen(
             ) {
                 resultMessage = ""
             }
-            .padding(16.dp),
+            .padding(horizontal = 16.dp, vertical = 10.dp),
         horizontalAlignment = Alignment.CenterHorizontally
     ) {
         Text(
             text = "字母牌陣",
-            fontSize = 28.sp,
+            fontSize = 26.sp,
             fontWeight = FontWeight.Bold
         )
 
-        Spacer(modifier = Modifier.height(6.dp))
+        Spacer(modifier = Modifier.height(4.dp))
+
+        OutlinedButton(
+            onClick = onBackClick,
+            modifier = Modifier.fillMaxWidth()
+        ) {
+            Text(text = "返回模式選擇")
+        }
+
+        Spacer(modifier = Modifier.height(4.dp))
 
         Text(
             text = "灰色牌被上層壓住，不能點選",
-            fontSize = 14.sp,
+            fontSize = 13.sp,
             textAlign = TextAlign.Center
         )
 
-        Spacer(modifier = Modifier.height(6.dp))
+        Spacer(modifier = Modifier.height(4.dp))
 
         Text(
             text = "3字30｜4字50｜5字100｜6字以上150",
-            fontSize = 13.sp,
+            fontSize = 12.sp,
             textAlign = TextAlign.Center
         )
 
         Text(
             text = "提示任務完成不計分",
-            fontSize = 13.sp,
+            fontSize = 12.sp,
             textAlign = TextAlign.Center
         )
 
-        Spacer(modifier = Modifier.height(8.dp))
+        Spacer(modifier = Modifier.height(6.dp))
 
         Text(
             text = "分數：$score　提示：$hintCount / 3　剩餘：$remainingTileCount",
-            fontSize = 18.sp,
+            fontSize = 17.sp,
             fontWeight = FontWeight.Bold
         )
 
-        Spacer(modifier = Modifier.height(10.dp))
+        Spacer(modifier = Modifier.height(8.dp))
 
         LetterTileBoard(
             tiles = tiles,
@@ -195,7 +208,7 @@ fun LetterTileScreen(
             }
         )
 
-        Spacer(modifier = Modifier.height(10.dp))
+        Spacer(modifier = Modifier.height(8.dp))
 
         Card(
             modifier = Modifier.fillMaxWidth(),
@@ -203,15 +216,15 @@ fun LetterTileScreen(
             elevation = CardDefaults.cardElevation(defaultElevation = 4.dp)
         ) {
             Column(
-                modifier = Modifier.padding(14.dp),
+                modifier = Modifier.padding(10.dp),
                 horizontalAlignment = Alignment.CenterHorizontally
             ) {
                 Text(
                     text = "目前選取",
-                    fontSize = 15.sp
+                    fontSize = 14.sp
                 )
 
-                Spacer(modifier = Modifier.height(6.dp))
+                Spacer(modifier = Modifier.height(4.dp))
 
                 Text(
                     text = if (selectedWord.isEmpty()) {
@@ -219,14 +232,14 @@ fun LetterTileScreen(
                     } else {
                         selectedWord
                     },
-                    fontSize = 27.sp,
+                    fontSize = 25.sp,
                     fontWeight = FontWeight.Bold,
                     letterSpacing = 3.sp,
                     textAlign = TextAlign.Center
                 )
 
                 if (resultMessage.isNotEmpty()) {
-                    Spacer(modifier = Modifier.height(12.dp))
+                    Spacer(modifier = Modifier.height(8.dp))
 
                     Card(
                         modifier = Modifier.fillMaxWidth(),
@@ -237,29 +250,29 @@ fun LetterTileScreen(
                         elevation = CardDefaults.cardElevation(defaultElevation = 2.dp)
                     ) {
                         Column(
-                            modifier = Modifier.padding(12.dp),
+                            modifier = Modifier.padding(10.dp),
                             horizontalAlignment = Alignment.CenterHorizontally
                         ) {
                             Text(
                                 text = "本次結果",
-                                fontSize = 15.sp,
+                                fontSize = 14.sp,
                                 fontWeight = FontWeight.Bold
                             )
 
-                            Spacer(modifier = Modifier.height(6.dp))
+                            Spacer(modifier = Modifier.height(4.dp))
 
                             Text(
                                 text = resultMessage,
-                                fontSize = 16.sp,
+                                fontSize = 15.sp,
                                 fontWeight = FontWeight.Bold,
                                 textAlign = TextAlign.Center
                             )
 
-                            Spacer(modifier = Modifier.height(6.dp))
+                            Spacer(modifier = Modifier.height(4.dp))
 
                             Text(
                                 text = "點一下畫面可關閉提示",
-                                fontSize = 13.sp,
+                                fontSize = 12.sp,
                                 color = Color.White.copy(alpha = 0.85f),
                                 textAlign = TextAlign.Center
                             )
@@ -267,7 +280,7 @@ fun LetterTileScreen(
                     }
                 }
 
-                Spacer(modifier = Modifier.height(12.dp))
+                Spacer(modifier = Modifier.height(8.dp))
 
                 Button(
                     onClick = {
@@ -360,7 +373,7 @@ fun LetterTileScreen(
                     Text(text = "檢查單字")
                 }
 
-                Spacer(modifier = Modifier.height(10.dp))
+                Spacer(modifier = Modifier.height(6.dp))
 
                 OutlinedButton(
                     onClick = {
@@ -381,7 +394,7 @@ fun LetterTileScreen(
                     Text(text = "清除選取")
                 }
 
-                Spacer(modifier = Modifier.height(10.dp))
+                Spacer(modifier = Modifier.height(6.dp))
 
                 OutlinedButton(
                     onClick = {
@@ -434,7 +447,7 @@ fun LetterTileScreen(
                     Text(text = "提示")
                 }
 
-                Spacer(modifier = Modifier.height(10.dp))
+                Spacer(modifier = Modifier.height(6.dp))
 
                 OutlinedButton(
                     onClick = {
@@ -456,40 +469,7 @@ fun LetterTileScreen(
             }
         }
 
-        Spacer(modifier = Modifier.height(8.dp))
-
-        if (resultMessage.isNotEmpty()) {
-            Card(
-                modifier = Modifier.fillMaxWidth(),
-                colors = CardDefaults.cardColors(
-                    containerColor = MaterialTheme.colorScheme.secondaryContainer
-                ),
-                shape = RoundedCornerShape(16.dp),
-                elevation = CardDefaults.cardElevation(defaultElevation = 3.dp)
-            ) {
-                Column(
-                    modifier = Modifier.padding(14.dp),
-                    horizontalAlignment = Alignment.CenterHorizontally
-                ) {
-                    Text(
-                        text = "本次結果",
-                        fontSize = 15.sp,
-                        fontWeight = FontWeight.Bold
-                    )
-
-                    Spacer(modifier = Modifier.height(6.dp))
-
-                    Text(
-                        text = resultMessage,
-                        fontSize = 17.sp,
-                        fontWeight = FontWeight.Bold,
-                        textAlign = TextAlign.Center
-                    )
-                }
-            }
-        }
-
-        Spacer(modifier = Modifier.height(12.dp))
+        Spacer(modifier = Modifier.height(24.dp))
     }
 }
 
@@ -502,7 +482,7 @@ fun LetterTileBoard(
     Box(
         modifier = Modifier
             .fillMaxWidth()
-            .height(330.dp)
+            .height(315.dp)
             .background(
                 color = Color(0xFF3E2723),
                 shape = RoundedCornerShape(18.dp)
@@ -558,7 +538,7 @@ fun LetterTileButton(
 
     Box(
         modifier = modifier
-            .size(width = 52.dp, height = 62.dp)
+            .size(width = 46.dp, height = 54.dp)
             .alpha(if (isAvailable) 1.0f else 0.38f)
             .background(
                 color = when {
@@ -592,7 +572,7 @@ fun LetterTileButton(
     ) {
         Text(
             text = tile.letter,
-            fontSize = 25.sp,
+            fontSize = 22.sp,
             fontWeight = FontWeight.Bold,
             color = if (isAvailable) Color.Black else Color.Gray
         )
@@ -605,9 +585,15 @@ fun LetterTileResultScreen(
     onPlayAgainClick: () -> Unit,
     onBackClick: () -> Unit
 ) {
+    val context = LocalContext.current
+    val clipboardManager = LocalClipboardManager.current
+    val resultText = buildLetterTileResultText(result)
+
     Column(
         modifier = Modifier
             .fillMaxSize()
+            .navigationBarsPadding()
+            .verticalScroll(rememberScrollState())
             .padding(24.dp),
         verticalArrangement = Arrangement.Center,
         horizontalAlignment = Alignment.CenterHorizontally
@@ -658,6 +644,35 @@ fun LetterTileResultScreen(
         Spacer(modifier = Modifier.height(24.dp))
 
         Button(
+            onClick = {
+                clipboardManager.setText(AnnotatedString(resultText))
+            },
+            modifier = Modifier.fillMaxWidth()
+        ) {
+            Text(text = "複製成果")
+        }
+
+        Spacer(modifier = Modifier.height(12.dp))
+
+        Button(
+            onClick = {
+                val sendIntent = Intent().apply {
+                    action = Intent.ACTION_SEND
+                    putExtra(Intent.EXTRA_TEXT, resultText)
+                    type = "text/plain"
+                }
+
+                val shareIntent = Intent.createChooser(sendIntent, "分享成果")
+                context.startActivity(shareIntent)
+            },
+            modifier = Modifier.fillMaxWidth()
+        ) {
+            Text(text = "分享成果")
+        }
+
+        Spacer(modifier = Modifier.height(12.dp))
+
+        Button(
             onClick = onPlayAgainClick,
             modifier = Modifier.fillMaxWidth()
         ) {
@@ -672,6 +687,8 @@ fun LetterTileResultScreen(
         ) {
             Text(text = "返回模式選擇")
         }
+
+        Spacer(modifier = Modifier.height(80.dp))
     }
 }
 
@@ -695,4 +712,17 @@ fun ResultTextRow(
             }
         )
     }
+}
+
+fun buildLetterTileResultText(
+    result: LetterTileGameResult
+): String {
+    return """
+        Word Grid Quest 模式一：字母牌陣
+        分數：${result.score}
+        成功單字：${result.successWordCount} 個
+        已消除牌數：${result.removedTileCount} 張
+        剩餘牌數：${result.remainingTileCount} 張
+        使用提示：${result.hintUsedCount} / 3 次
+    """.trimIndent()
 }
