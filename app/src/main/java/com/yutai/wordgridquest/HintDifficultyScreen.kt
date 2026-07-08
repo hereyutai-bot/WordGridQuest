@@ -24,29 +24,29 @@ enum class HintGameDifficulty(
     val clueMode: ClueMode
 ) {
     PRACTICE(
-        title = "練習模式",
-        description = "少挖空，適合初學",
+        title = "入門模式",
+        description = "少量挖空，適合剛開始學習",
         secondsPerQuestion = null,
         clueMode = ClueMode.EASY
     ),
 
     CHALLENGE(
-        title = "挑戰模式",
-        description = "中等挖空，難度適中",
+        title = "標準模式",
+        description = "中等挖空，適合一般練習",
         secondsPerQuestion = null,
         clueMode = ClueMode.NORMAL
     ),
 
     FAST(
-        title = "快速模式",
-        description = "多挖空，較有挑戰",
+        title = "進階模式",
+        description = "大量挖空，較有挑戰",
         secondsPerQuestion = null,
         clueMode = ClueMode.HARD
     ),
 
     HELL(
         title = "地獄模式",
-        description = "完全不提示英文，只看中文意思",
+        description = "完全不提示英文，只看中文意思作答",
         secondsPerQuestion = null,
         clueMode = ClueMode.HELL
     )

@@ -173,6 +173,38 @@ fun buildHintQuestionsFromDictionary(): List<HintWordQuestion> {
         }
 }
 
+fun buildHintQuestionsForDifficulty(
+    difficulty: HintGameDifficulty
+): List<HintWordQuestion> {
+    val wordLengthRange = when (difficulty) {
+        HintGameDifficulty.PRACTICE -> 3..5
+        HintGameDifficulty.CHALLENGE -> 4..6
+        HintGameDifficulty.FAST -> 5..8
+        HintGameDifficulty.HELL -> 5..10
+    }
+
+    return dictionaryWords
+        .filter { dictionaryWord ->
+            dictionaryWord.word.length in wordLengthRange
+        }
+        .map { dictionaryWord ->
+            val upperWord = dictionaryWord.word.uppercase()
+
+            HintWordQuestion(
+                word = upperWord,
+                meaning = dictionaryWord.meaning,
+                clue = buildWordClue(
+                    word = upperWord,
+                    clueMode = difficulty.clueMode
+                ),
+                missingAnswer = buildMissingAnswer(
+                    word = upperWord,
+                    clueMode = difficulty.clueMode
+                )
+            )
+        }
+}
+
 fun buildWordClue(
     word: String,
     clueMode: ClueMode

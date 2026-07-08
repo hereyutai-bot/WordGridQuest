@@ -51,8 +51,12 @@ fun HintWordGameScreen(
     val context = LocalContext.current
     val clipboardManager = LocalClipboardManager.current
 
-    var gameQuestions by remember {
-        mutableStateOf(hintWordQuestions.shuffled().take(10))
+    var gameQuestions by remember(difficulty) {
+        mutableStateOf(
+            buildHintQuestionsForDifficulty(difficulty)
+                .shuffled()
+                .take(10)
+        )
     }
 
     var currentIndex by remember { mutableIntStateOf(0) }
@@ -147,7 +151,9 @@ fun HintWordGameScreen(
             skipCount = skipCount,
             questionResults = questionResults,
             onPlayAgain = {
-                gameQuestions = hintWordQuestions.shuffled().take(10)
+                gameQuestions = buildHintQuestionsForDifficulty(difficulty)
+                    .shuffled()
+                    .take(10)
                 currentIndex = 0
                 selectedAnswer = ""
                 score = 0
