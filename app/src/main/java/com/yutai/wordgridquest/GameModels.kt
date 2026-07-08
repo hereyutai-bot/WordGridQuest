@@ -15,11 +15,11 @@ data class HintWordQuestion(
     val clue: String,
     val missingAnswer: String
 )
-
 data class GameResult(
     val score: Int,
     val correctCount: Int,
     val wrongCount: Int,
+    val skipCount: Int,
     val totalQuestions: Int
 )
 

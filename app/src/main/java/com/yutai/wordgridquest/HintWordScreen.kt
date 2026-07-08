@@ -18,6 +18,7 @@ import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.shape.CircleShape
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material3.Button
+import androidx.compose.material3.ButtonDefaults
 import androidx.compose.material3.Card
 import androidx.compose.material3.CardDefaults
 import androidx.compose.material3.OutlinedButton
@@ -35,7 +36,6 @@ import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
-import androidx.compose.material3.ButtonDefaults
 
 @Composable
 fun HintWordScreen(
@@ -47,6 +47,7 @@ fun HintWordScreen(
     var score by remember { mutableIntStateOf(0) }
     var correctCount by remember { mutableIntStateOf(0) }
     var wrongCount by remember { mutableIntStateOf(0) }
+    var skipCount by remember { mutableIntStateOf(0) }
     var hasAnswered by remember { mutableStateOf(false) }
     var showResult by remember { mutableStateOf(false) }
 
@@ -59,6 +60,7 @@ fun HintWordScreen(
                 score = score,
                 correctCount = correctCount,
                 wrongCount = wrongCount,
+                skipCount = skipCount,
                 totalQuestions = totalQuestions
             ),
             onPlayAgainClick = {
@@ -68,6 +70,7 @@ fun HintWordScreen(
                 score = 0
                 correctCount = 0
                 wrongCount = 0
+                skipCount = 0
                 hasAnswered = false
                 showResult = false
             },
@@ -182,6 +185,24 @@ fun HintWordScreen(
 
                 Spacer(modifier = Modifier.height(12.dp))
 
+                OutlinedButton(
+                    onClick = {
+                        if (!hasAnswered) {
+                            selectedAnswer = "-"
+                            resultMessage =
+                                "已跳過此題，正確答案是 ${question.missingAnswer}，完整單字是 ${question.word}"
+                            skipCount += 1
+                            hasAnswered = true
+                        }
+                    },
+                    enabled = !hasAnswered,
+                    modifier = Modifier.fillMaxWidth()
+                ) {
+                    Text(text = "跳過此題")
+                }
+
+                Spacer(modifier = Modifier.height(12.dp))
+
                 Button(
                     onClick = {
                         if (questionIndex < totalQuestions - 1) {
@@ -218,7 +239,7 @@ fun HintWordScreen(
         Spacer(modifier = Modifier.height(6.dp))
 
         Text(
-            text = "答對：$correctCount　答錯：$wrongCount",
+            text = "答對：$correctCount　答錯：$wrongCount　跳過：$skipCount",
             fontSize = 16.sp
         )
 
@@ -262,10 +283,11 @@ fun AlphabetButtonGrid(
                     onLetterClick(letter)
                 },
                 enabled = !hasAnswered,
-                contentPadding = ButtonDefaults.ContentPadding,
+                shape = CircleShape,
+                contentPadding = PaddingValues(0.dp),
                 modifier = Modifier
                     .padding(horizontal = 4.dp)
-                    .size(44.dp)
+                    .size(42.dp)
             ) {
                 Text(
                     text = letter,
@@ -275,7 +297,8 @@ fun AlphabetButtonGrid(
                     } else {
                         FontWeight.SemiBold
                     },
-                    textAlign = TextAlign.Center
+                    textAlign = TextAlign.Center,
+                    maxLines = 1
                 )
             }
         }
@@ -299,6 +322,7 @@ fun GameResultScreen(
         score = result.score,
         correctCount = result.correctCount,
         wrongCount = result.wrongCount,
+        skipCount = result.skipCount,
         totalQuestions = result.totalQuestions,
         accuracy = accuracy
     )
@@ -331,6 +355,7 @@ fun GameResultScreen(
                 ResultTextRow(label = "總題數", value = "${result.totalQuestions} 題")
                 ResultTextRow(label = "答對", value = "${result.correctCount} 題")
                 ResultTextRow(label = "答錯", value = "${result.wrongCount} 題")
+                ResultTextRow(label = "跳過", value = "${result.skipCount} 題")
                 ResultTextRow(label = "正確率", value = "$accuracy%")
             }
         }
@@ -381,6 +406,7 @@ fun buildShareText(
     score: Int,
     correctCount: Int,
     wrongCount: Int,
+    skipCount: Int,
     totalQuestions: Int,
     accuracy: Int
 ): String {
@@ -392,6 +418,7 @@ fun buildShareText(
         總題數：$totalQuestions 題
         答對：$correctCount 題
         答錯：$wrongCount 題
+        跳過：$skipCount 題
         正確率：$accuracy%
 
         一起來挑戰英文單字吧！
