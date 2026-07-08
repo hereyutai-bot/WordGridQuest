@@ -15,6 +15,7 @@ enum class WordLevel {
 val dictionaryWords: List<DictionaryWord> =
     basicDictionaryWords +
             commonDictionaryWords +
+            commonDictionaryWordsPart2 +
             advancedDictionaryWords
 
 fun buildValidWordsFromDictionary(): Map<String, String> {
