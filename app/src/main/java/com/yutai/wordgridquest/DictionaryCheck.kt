@@ -8,6 +8,11 @@ data class DictionaryCheckResult(
     val invalidFormatWords: List<String>
 )
 
+data class DictionarySourceCount(
+    val sourceName: String,
+    val count: Int
+)
+
 fun checkDictionaryWords(
     words: List<DictionaryWord> = dictionaryWords
 ): DictionaryCheckResult {
@@ -44,15 +49,44 @@ fun checkDictionaryWords(
     )
 }
 
+fun getDictionarySourceCounts(): List<DictionarySourceCount> {
+    return listOf(
+        DictionarySourceCount(
+            sourceName = "BasicDictionaryWords",
+            count = basicDictionaryWords.size
+        ),
+        DictionarySourceCount(
+            sourceName = "CommonDictionaryWords",
+            count = commonDictionaryWords.size
+        ),
+        DictionarySourceCount(
+            sourceName = "CommonDictionaryWordsPart2",
+            count = commonDictionaryWordsPart2.size
+        ),
+        DictionarySourceCount(
+            sourceName = "AdvancedDictionaryWords",
+            count = advancedDictionaryWords.size
+        )
+    )
+}
+
 fun buildDictionaryCheckReport(
     result: DictionaryCheckResult = checkDictionaryWords()
 ): String {
+    val sourceCounts = getDictionarySourceCounts()
+
     return buildString {
         appendLine("字典檢查報告")
         appendLine("--------------------")
         appendLine("總單字數：${result.totalCount}")
         appendLine()
 
+        appendLine("字典來源統計")
+        sourceCounts.forEach { sourceCount ->
+            appendLine("- ${sourceCount.sourceName}：${sourceCount.count} 筆")
+        }
+
+        appendLine()
         appendLine("重複單字：${result.duplicateWords.size}")
         if (result.duplicateWords.isNotEmpty()) {
             result.duplicateWords.forEach { word ->

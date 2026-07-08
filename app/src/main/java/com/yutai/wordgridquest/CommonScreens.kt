@@ -593,6 +593,7 @@ fun DictionaryCheckScreen(
     onBackClick: () -> Unit
 ) {
     val result = checkDictionaryWords()
+    val sourceCounts = getDictionarySourceCounts()
 
     Column(
         modifier = Modifier
@@ -614,6 +615,12 @@ fun DictionaryCheckScreen(
         DictionaryCheckSummaryCard(
             title = "總單字數",
             content = "${result.totalCount} 筆"
+        )
+
+        Spacer(modifier = Modifier.height(12.dp))
+
+        DictionarySourceCountCard(
+            sourceCounts = sourceCounts
         )
 
         Spacer(modifier = Modifier.height(12.dp))
@@ -682,6 +689,37 @@ private fun DictionaryCheckSummaryCard(
                 text = content,
                 fontSize = 18.sp
             )
+        }
+    }
+}
+
+
+@Composable
+private fun DictionarySourceCountCard(
+    sourceCounts: List<DictionarySourceCount>
+) {
+    Card(
+        modifier = Modifier.fillMaxWidth(),
+        shape = RoundedCornerShape(16.dp),
+        elevation = CardDefaults.cardElevation(defaultElevation = 3.dp)
+    ) {
+        Column(
+            modifier = Modifier.padding(18.dp)
+        ) {
+            Text(
+                text = "字典來源統計",
+                fontSize = 20.sp,
+                fontWeight = FontWeight.Bold
+            )
+
+            Spacer(modifier = Modifier.height(8.dp))
+
+            sourceCounts.forEach { sourceCount ->
+                Text(
+                    text = "${sourceCount.sourceName}：${sourceCount.count} 筆",
+                    fontSize = 16.sp
+                )
+            }
         }
     }
 }
