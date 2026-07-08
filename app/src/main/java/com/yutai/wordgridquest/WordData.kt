@@ -29,6 +29,156 @@ val hintWordQuestions = listOf(
         meaning = "遊戲",
         clue = "G A _ E",
         missingAnswer = "M"
+    ),
+    HintWordQuestion(
+        word = "SUN",
+        meaning = "太陽",
+        clue = "S _ N",
+        missingAnswer = "U"
+    ),
+    HintWordQuestion(
+        word = "MOON",
+        meaning = "月亮",
+        clue = "M _ O N",
+        missingAnswer = "O"
+    ),
+    HintWordQuestion(
+        word = "STAR",
+        meaning = "星星",
+        clue = "S T _ R",
+        missingAnswer = "A"
+    ),
+    HintWordQuestion(
+        word = "TREE",
+        meaning = "樹",
+        clue = "T R _ E",
+        missingAnswer = "E"
+    ),
+    HintWordQuestion(
+        word = "FISH",
+        meaning = "魚",
+        clue = "F _ S H",
+        missingAnswer = "I"
+    ),
+    HintWordQuestion(
+        word = "BIRD",
+        meaning = "鳥",
+        clue = "B I _ D",
+        missingAnswer = "R"
+    ),
+    HintWordQuestion(
+        word = "MILK",
+        meaning = "牛奶",
+        clue = "M I _ K",
+        missingAnswer = "L"
+    ),
+    HintWordQuestion(
+        word = "CAKE",
+        meaning = "蛋糕",
+        clue = "C A _ E",
+        missingAnswer = "K"
+    ),
+    HintWordQuestion(
+        word = "HAND",
+        meaning = "手",
+        clue = "H A _ D",
+        missingAnswer = "N"
+    ),
+    HintWordQuestion(
+        word = "FOOD",
+        meaning = "食物",
+        clue = "F O _ D",
+        missingAnswer = "O"
+    ),
+    HintWordQuestion(
+        word = "RAIN",
+        meaning = "雨",
+        clue = "R A _ N",
+        missingAnswer = "I"
+    ),
+    HintWordQuestion(
+        word = "HOUSE",
+        meaning = "房子",
+        clue = "H O _ S E",
+        missingAnswer = "U"
+    ),
+    HintWordQuestion(
+        word = "MOUSE",
+        meaning = "老鼠",
+        clue = "M O _ S E",
+        missingAnswer = "U"
+    ),
+    HintWordQuestion(
+        word = "TABLE",
+        meaning = "桌子",
+        clue = "T A _ L E",
+        missingAnswer = "B"
+    ),
+    HintWordQuestion(
+        word = "CHAIR",
+        meaning = "椅子",
+        clue = "C H _ I R",
+        missingAnswer = "A"
+    ),
+    HintWordQuestion(
+        word = "PEN",
+        meaning = "筆",
+        clue = "P _ N",
+        missingAnswer = "E"
+    ),
+    HintWordQuestion(
+        word = "BED",
+        meaning = "床",
+        clue = "B _ D",
+        missingAnswer = "E"
+    ),
+    HintWordQuestion(
+        word = "CAR",
+        meaning = "車",
+        clue = "C _ R",
+        missingAnswer = "A"
+    ),
+    HintWordQuestion(
+        word = "BUS",
+        meaning = "公車",
+        clue = "B _ S",
+        missingAnswer = "U"
+    ),
+    HintWordQuestion(
+        word = "CUP",
+        meaning = "杯子",
+        clue = "C _ P",
+        missingAnswer = "U"
+    ),
+    HintWordQuestion(
+        word = "BOX",
+        meaning = "盒子",
+        clue = "B _ X",
+        missingAnswer = "O"
+    ),
+    HintWordQuestion(
+        word = "EGG",
+        meaning = "蛋",
+        clue = "E _ G",
+        missingAnswer = "G"
+    ),
+    HintWordQuestion(
+        word = "MAP",
+        meaning = "地圖",
+        clue = "M _ P",
+        missingAnswer = "A"
+    ),
+    HintWordQuestion(
+        word = "RED",
+        meaning = "紅色",
+        clue = "R _ D",
+        missingAnswer = "E"
+    ),
+    HintWordQuestion(
+        word = "BLUE",
+        meaning = "藍色",
+        clue = "B L _ E",
+        missingAnswer = "U"
     )
 )
 val validWords = mapOf(
