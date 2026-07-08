@@ -35,7 +35,13 @@ import androidx.compose.ui.text.AnnotatedString
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
 import kotlinx.coroutines.delay
-
+import androidx.compose.foundation.layout.Box
+import androidx.compose.foundation.border
+import androidx.compose.foundation.layout.size
+import androidx.compose.foundation.shape.RoundedCornerShape
+import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.text.style.TextAlign
+import androidx.compose.ui.unit.sp
 @Composable
 fun HintWordGameScreen(
     difficulty: HintGameDifficulty,
@@ -99,10 +105,10 @@ fun HintWordGameScreen(
             if (timeLeft == 0 && !isAnswered && !isGameFinished) {
                 isAnswered = true
                 skipCount += 1
-                answerFeedback = "時間到！正確答案是：$correctAnswer"
+                answerFeedback = "時間到！正確答案是：${currentQuestion.word}"
 
                 questionResults.add(
-                    "第 ${currentIndex + 1} 題：時間到，答案：$correctAnswer"
+                    "第 ${currentIndex + 1} 題：時間到，答案：${currentQuestion.word}"
                 )
             }
         }
@@ -324,10 +330,9 @@ fun HintWordGameScreen(
 
         Spacer(modifier = Modifier.height(12.dp))
 
-        Text(
-            text = selectedAnswer.ifEmpty { "請用 A-Z 按鈕拼出答案" },
-            style = MaterialTheme.typography.headlineSmall,
-            fontWeight = FontWeight.Bold
+        HintAnswerSlots(
+            clue = currentQuestion.clue,
+            selectedAnswer = selectedAnswer
         )
 
         Spacer(modifier = Modifier.height(8.dp))
@@ -368,13 +373,13 @@ fun HintWordGameScreen(
                         correctCount += 1
                         answerFeedback = "答對了！+10 分"
                         questionResults.add(
-                            "第 ${currentIndex + 1} 題：答對，答案：$correctAnswer"
+                            "第 ${currentIndex + 1} 題：答對，答案：${currentQuestion.word}"
                         )
                     } else {
                         wrongCount += 1
-                        answerFeedback = "答錯了！正確答案是：$correctAnswer"
+                        answerFeedback = "答錯了！正確答案是：${currentQuestion.word}"
                         questionResults.add(
-                            "第 ${currentIndex + 1} 題：答錯，答案：$correctAnswer"
+                            "第 ${currentIndex + 1} 題：答錯，答案：${currentQuestion.word}"
                         )
                     }
 
@@ -392,10 +397,10 @@ fun HintWordGameScreen(
                 onClick = {
                     skipCount += 1
                     isAnswered = true
-                    answerFeedback = "已跳過，正確答案是：$correctAnswer"
+                    answerFeedback = "已跳過，正確答案是：${currentQuestion.word}"
 
                     questionResults.add(
-                        "第 ${currentIndex + 1} 題：跳過，答案：$correctAnswer"
+                        "第 ${currentIndex + 1} 題：跳過，答案：${currentQuestion.word}"
                     )
                 },
                 modifier = Modifier.fillMaxWidth()
@@ -413,7 +418,9 @@ fun HintWordGameScreen(
                 ('A'..'Z').forEach { letter ->
                     Button(
                         onClick = {
-                            selectedAnswer += letter
+                            if (selectedAnswer.length < correctAnswer.length) {
+                                selectedAnswer += letter
+                            }
                         },
                         modifier = Modifier.padding(2.dp)
                     ) {
@@ -474,5 +481,54 @@ fun HintWordGameScreen(
         }
 
         Spacer(modifier = Modifier.height(24.dp))
+    }
+}
+
+@Composable
+private fun HintAnswerSlots(
+    clue: String,
+    selectedAnswer: String
+) {
+    var answerIndex = 0
+
+    FlowRow(
+        modifier = Modifier.fillMaxWidth(),
+        horizontalArrangement = Arrangement.Center,
+        verticalArrangement = Arrangement.spacedBy(8.dp)
+    ) {
+        clue.forEach { char ->
+            val isBlank = char == '口' || char == '_'
+
+            val displayText = if (isBlank) {
+                val inputChar = selectedAnswer.getOrNull(answerIndex)
+                answerIndex += 1
+                inputChar?.toString() ?: ""
+            } else {
+                char.toString()
+            }
+
+            Box(
+                modifier = Modifier
+                    .padding(3.dp)
+                    .size(42.dp)
+                    .border(
+                        width = 2.dp,
+                        color = if (isBlank) {
+                            MaterialTheme.colorScheme.primary
+                        } else {
+                            Color.Gray
+                        },
+                        shape = RoundedCornerShape(8.dp)
+                    ),
+                contentAlignment = Alignment.Center
+            ) {
+                Text(
+                    text = displayText,
+                    fontSize = 22.sp,
+                    fontWeight = FontWeight.Bold,
+                    textAlign = TextAlign.Center
+                )
+            }
+        }
     }
 }
