@@ -7,6 +7,7 @@ import android.content.Intent
 import android.widget.Toast
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Column
+import androidx.compose.foundation.layout.ExperimentalLayoutApi
 import androidx.compose.foundation.layout.FlowRow
 import androidx.compose.foundation.layout.PaddingValues
 import androidx.compose.foundation.layout.Spacer
@@ -18,12 +19,12 @@ import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.shape.CircleShape
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material3.Button
-import androidx.compose.material3.ButtonDefaults
 import androidx.compose.material3.Card
 import androidx.compose.material3.CardDefaults
 import androidx.compose.material3.OutlinedButton
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableIntStateOf
 import androidx.compose.runtime.mutableStateOf
@@ -36,6 +37,9 @@ import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
+import kotlinx.coroutines.delay
+
+private const val QUESTION_TIME_LIMIT_SECONDS = 15
 
 @Composable
 fun HintWordScreen(
@@ -50,9 +54,35 @@ fun HintWordScreen(
     var skipCount by remember { mutableIntStateOf(0) }
     var hasAnswered by remember { mutableStateOf(false) }
     var showResult by remember { mutableStateOf(false) }
+    var remainingSeconds by remember { mutableIntStateOf(QUESTION_TIME_LIMIT_SECONDS) }
 
     val question = hintWordQuestions[questionIndex]
     val totalQuestions = hintWordQuestions.size
+
+    fun markCurrentQuestionAsSkippedByTimeout() {
+        selectedAnswer = "-"
+        resultMessage =
+            "時間到！正確答案是 ${question.missingAnswer}，完整單字是 ${question.word}"
+        skipCount += 1
+        hasAnswered = true
+    }
+
+    LaunchedEffect(questionIndex) {
+        remainingSeconds = QUESTION_TIME_LIMIT_SECONDS
+    }
+
+    LaunchedEffect(questionIndex, hasAnswered, showResult) {
+        if (!showResult && !hasAnswered) {
+            while (remainingSeconds > 0 && !hasAnswered && !showResult) {
+                delay(1000)
+                remainingSeconds -= 1
+            }
+
+            if (remainingSeconds <= 0 && !hasAnswered && !showResult) {
+                markCurrentQuestionAsSkippedByTimeout()
+            }
+        }
+    }
 
     if (showResult) {
         GameResultScreen(
@@ -73,6 +103,7 @@ fun HintWordScreen(
                 skipCount = 0
                 hasAnswered = false
                 showResult = false
+                remainingSeconds = QUESTION_TIME_LIMIT_SECONDS
             },
             onBackClick = onBackClick
         )
@@ -98,6 +129,14 @@ fun HintWordScreen(
         Text(
             text = "第 ${questionIndex + 1} / $totalQuestions 題",
             fontSize = 16.sp
+        )
+
+        Spacer(modifier = Modifier.height(6.dp))
+
+        Text(
+            text = "剩餘時間：$remainingSeconds 秒",
+            fontSize = 18.sp,
+            fontWeight = FontWeight.Bold
         )
 
         Spacer(modifier = Modifier.height(16.dp))
@@ -210,6 +249,7 @@ fun HintWordScreen(
                             selectedAnswer = ""
                             resultMessage = ""
                             hasAnswered = false
+                            remainingSeconds = QUESTION_TIME_LIMIT_SECONDS
                         } else {
                             showResult = true
                         }
@@ -264,6 +304,7 @@ fun HintWordScreen(
     }
 }
 
+@OptIn(ExperimentalLayoutApi::class)
 @Composable
 fun AlphabetButtonGrid(
     selectedAnswer: String,
