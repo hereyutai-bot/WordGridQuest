@@ -59,15 +59,13 @@ fun WordGridQuestApp() {
             onBackToModeSelect = { currentScreen = Screen.MODE_SELECT }
         )
 
-        Screen.RANKING -> SimplePageScreen(
-            title = "排行榜",
-            content = "排行榜將記錄最高分、完成單字數、正確率與遊玩時間。\n\n目前尚未儲存資料。",
+        Screen.RANKING -> RankingScreen(
+            records = emptyList(),
             onBackClick = { currentScreen = Screen.HOME }
         )
 
-        Screen.STUDY_RECORD -> SimplePageScreen(
-            title = "學習紀錄",
-            content = "學習紀錄將保存遊玩次數、錯誤單字、完成關卡與學習進度。\n\n目前尚未儲存資料。",
+        Screen.STUDY_RECORD -> StudyRecordScreen(
+            records = emptyList(),
             onBackClick = { currentScreen = Screen.HOME }
         )
 

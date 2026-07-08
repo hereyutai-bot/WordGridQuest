@@ -95,6 +95,202 @@ fun SimplePageScreen(
 }
 
 @Composable
+fun RankingScreen(
+    records: List<RankingRecord>,
+    onBackClick: () -> Unit
+) {
+    Column(
+        modifier = Modifier
+            .fillMaxSize()
+            .navigationBarsPadding()
+            .verticalScroll(rememberScrollState())
+            .padding(24.dp),
+        horizontalAlignment = Alignment.CenterHorizontally
+    ) {
+        Text(
+            text = "排行榜",
+            fontSize = 30.sp,
+            fontWeight = FontWeight.Bold,
+            textAlign = TextAlign.Center
+        )
+
+        Spacer(modifier = Modifier.height(20.dp))
+
+        if (records.isEmpty()) {
+            EmptyStateCard(
+                title = "尚無排行榜資料",
+                content = "之後完成遊戲後，會把高分紀錄顯示在這裡。"
+            )
+        } else {
+            records
+                .sortedByDescending { it.score }
+                .forEachIndexed { index, record ->
+                    RankingRecordCard(
+                        rank = index + 1,
+                        record = record
+                    )
+
+                    Spacer(modifier = Modifier.height(12.dp))
+                }
+        }
+
+        Spacer(modifier = Modifier.height(24.dp))
+
+        OutlinedButton(
+            onClick = onBackClick,
+            modifier = Modifier.fillMaxWidth()
+        ) {
+            Text(text = "返回首頁")
+        }
+
+        Spacer(modifier = Modifier.height(24.dp))
+    }
+}
+
+@Composable
+fun StudyRecordScreen(
+    records: List<StudyRecord>,
+    onBackClick: () -> Unit
+) {
+    Column(
+        modifier = Modifier
+            .fillMaxSize()
+            .navigationBarsPadding()
+            .verticalScroll(rememberScrollState())
+            .padding(24.dp),
+        horizontalAlignment = Alignment.CenterHorizontally
+    ) {
+        Text(
+            text = "學習紀錄",
+            fontSize = 30.sp,
+            fontWeight = FontWeight.Bold,
+            textAlign = TextAlign.Center
+        )
+
+        Spacer(modifier = Modifier.height(20.dp))
+
+        if (records.isEmpty()) {
+            EmptyStateCard(
+                title = "尚無學習紀錄",
+                content = "之後完成遊戲後，會記錄分數、答題狀況與學習成果。"
+            )
+        } else {
+            records.forEach { record ->
+                StudyRecordCard(record = record)
+
+                Spacer(modifier = Modifier.height(12.dp))
+            }
+        }
+
+        Spacer(modifier = Modifier.height(24.dp))
+
+        OutlinedButton(
+            onClick = onBackClick,
+            modifier = Modifier.fillMaxWidth()
+        ) {
+            Text(text = "返回首頁")
+        }
+
+        Spacer(modifier = Modifier.height(24.dp))
+    }
+}
+
+@Composable
+private fun EmptyStateCard(
+    title: String,
+    content: String
+) {
+    Card(
+        modifier = Modifier.fillMaxWidth(),
+        shape = RoundedCornerShape(16.dp),
+        elevation = CardDefaults.cardElevation(defaultElevation = 3.dp)
+    ) {
+        Column(
+            modifier = Modifier.padding(20.dp),
+            horizontalAlignment = Alignment.CenterHorizontally
+        ) {
+            Text(
+                text = title,
+                fontSize = 20.sp,
+                fontWeight = FontWeight.Bold,
+                textAlign = TextAlign.Center
+            )
+
+            Spacer(modifier = Modifier.height(8.dp))
+
+            Text(
+                text = content,
+                fontSize = 16.sp,
+                textAlign = TextAlign.Center
+            )
+        }
+    }
+}
+
+@Composable
+private fun RankingRecordCard(
+    rank: Int,
+    record: RankingRecord
+) {
+    Card(
+        modifier = Modifier.fillMaxWidth(),
+        shape = RoundedCornerShape(16.dp),
+        elevation = CardDefaults.cardElevation(defaultElevation = 3.dp)
+    ) {
+        Column(
+            modifier = Modifier.padding(18.dp)
+        ) {
+            Text(
+                text = "第 $rank 名",
+                fontSize = 20.sp,
+                fontWeight = FontWeight.Bold
+            )
+
+            Spacer(modifier = Modifier.height(6.dp))
+
+            Text(text = "玩家：${record.playerName}", fontSize = 16.sp)
+            Text(text = "模式：${record.modeType.displayName}", fontSize = 16.sp)
+            Text(text = "分數：${record.score}", fontSize = 16.sp)
+            Text(text = "內容：${record.detailText}", fontSize = 16.sp)
+            Text(text = "時間：${record.playedAtText}", fontSize = 16.sp)
+        }
+    }
+}
+
+@Composable
+private fun StudyRecordCard(
+    record: StudyRecord
+) {
+    Card(
+        modifier = Modifier.fillMaxWidth(),
+        shape = RoundedCornerShape(16.dp),
+        elevation = CardDefaults.cardElevation(defaultElevation = 3.dp)
+    ) {
+        Column(
+            modifier = Modifier.padding(18.dp)
+        ) {
+            Text(
+                text = record.modeType.displayName,
+                fontSize = 20.sp,
+                fontWeight = FontWeight.Bold
+            )
+
+            Spacer(modifier = Modifier.height(6.dp))
+
+            Text(text = "分數：${record.score}", fontSize = 16.sp)
+            Text(text = "答對：${record.correctCount}", fontSize = 16.sp)
+            Text(text = "答錯：${record.wrongCount}", fontSize = 16.sp)
+            Text(text = "跳過：${record.skipCount}", fontSize = 16.sp)
+            Text(text = "時間：${record.playedAtText}", fontSize = 16.sp)
+
+            if (record.note.isNotBlank()) {
+                Text(text = "備註：${record.note}", fontSize = 16.sp)
+            }
+        }
+    }
+}
+
+@Composable
 fun GameHelpScreen(
     onBackClick: () -> Unit
 ) {

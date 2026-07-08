@@ -9,6 +9,7 @@ import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
+import androidx.compose.foundation.layout.navigationBarsPadding
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.rememberScrollState
 import androidx.compose.foundation.verticalScroll
@@ -168,8 +169,9 @@ fun HintWordGameScreen(
     Column(
         modifier = Modifier
             .fillMaxSize()
-            .padding(18.dp)
-            .verticalScroll(rememberScrollState()),
+            .navigationBarsPadding()
+            .verticalScroll(rememberScrollState())
+            .padding(horizontal = 18.dp, vertical = 8.dp),
         horizontalAlignment = Alignment.CenterHorizontally
     ) {
         Text(
@@ -178,14 +180,14 @@ fun HintWordGameScreen(
             fontWeight = FontWeight.Bold
         )
 
-        Spacer(modifier = Modifier.height(6.dp))
+        Spacer(modifier = Modifier.height(4.dp))
 
         Text(
             text = difficulty.title,
             style = MaterialTheme.typography.titleMedium
         )
 
-        Spacer(modifier = Modifier.height(12.dp))
+        Spacer(modifier = Modifier.height(8.dp))
 
         Row(
             modifier = Modifier.fillMaxWidth(),
@@ -204,7 +206,7 @@ fun HintWordGameScreen(
         }
 
         if (difficulty.secondsPerQuestion != null) {
-            Spacer(modifier = Modifier.height(8.dp))
+            Spacer(modifier = Modifier.height(6.dp))
 
             Text(
                 text = "剩餘時間：$timeLeft 秒",
@@ -213,7 +215,7 @@ fun HintWordGameScreen(
             )
         }
 
-        Spacer(modifier = Modifier.height(10.dp))
+        Spacer(modifier = Modifier.height(8.dp))
 
         Row(
             horizontalArrangement = Arrangement.spacedBy(12.dp)
@@ -241,7 +243,7 @@ fun HintWordGameScreen(
             }
         }
 
-        Spacer(modifier = Modifier.height(20.dp))
+        Spacer(modifier = Modifier.height(12.dp))
 
         if (isPaused) {
             Card(
@@ -276,7 +278,7 @@ fun HintWordGameScreen(
             modifier = Modifier.fillMaxWidth()
         ) {
             Column(
-                modifier = Modifier.padding(18.dp),
+                modifier = Modifier.padding(14.dp),
                 horizontalAlignment = Alignment.Start
             ) {
                 Text(
@@ -285,14 +287,14 @@ fun HintWordGameScreen(
                     fontWeight = FontWeight.Bold
                 )
 
-                Spacer(modifier = Modifier.height(8.dp))
+                Spacer(modifier = Modifier.height(6.dp))
 
                 Text(
                     text = "中文：${currentQuestion.meaning}",
                     style = MaterialTheme.typography.bodyLarge
                 )
 
-                Spacer(modifier = Modifier.height(6.dp))
+                Spacer(modifier = Modifier.height(4.dp))
 
                 Text(
                     text = "拼字：${currentQuestion.clue}",
@@ -302,7 +304,7 @@ fun HintWordGameScreen(
             }
         }
 
-        Spacer(modifier = Modifier.height(20.dp))
+        Spacer(modifier = Modifier.height(12.dp))
 
         Text(
             text = selectedAnswer.ifEmpty { "請用 A-Z 按鈕拼出答案" },
@@ -310,7 +312,7 @@ fun HintWordGameScreen(
             fontWeight = FontWeight.Bold
         )
 
-        Spacer(modifier = Modifier.height(14.dp))
+        Spacer(modifier = Modifier.height(8.dp))
 
         if (!isAnswered) {
             Row(
@@ -337,7 +339,7 @@ fun HintWordGameScreen(
                 }
             }
 
-            Spacer(modifier = Modifier.height(12.dp))
+            Spacer(modifier = Modifier.height(8.dp))
 
             Button(
                 onClick = {
@@ -366,7 +368,7 @@ fun HintWordGameScreen(
                 Text(text = "送出答案")
             }
 
-            Spacer(modifier = Modifier.height(8.dp))
+            Spacer(modifier = Modifier.height(6.dp))
 
             OutlinedButton(
                 onClick = {
@@ -383,19 +385,19 @@ fun HintWordGameScreen(
                 Text(text = "跳過此題")
             }
 
-            Spacer(modifier = Modifier.height(16.dp))
+            Spacer(modifier = Modifier.height(10.dp))
 
             FlowRow(
                 modifier = Modifier.fillMaxWidth(),
                 horizontalArrangement = Arrangement.Center,
-                verticalArrangement = Arrangement.spacedBy(8.dp)
+                verticalArrangement = Arrangement.spacedBy(6.dp)
             ) {
                 ('A'..'Z').forEach { letter ->
                     Button(
                         onClick = {
                             selectedAnswer += letter
                         },
-                        modifier = Modifier.padding(3.dp)
+                        modifier = Modifier.padding(2.dp)
                     ) {
                         Text(text = letter.toString())
                     }
@@ -427,7 +429,7 @@ fun HintWordGameScreen(
                 }
             }
 
-            Spacer(modifier = Modifier.height(20.dp))
+            Spacer(modifier = Modifier.height(12.dp))
 
             Button(
                 onClick = {
@@ -452,5 +454,7 @@ fun HintWordGameScreen(
                 )
             }
         }
+
+        Spacer(modifier = Modifier.height(24.dp))
     }
 }

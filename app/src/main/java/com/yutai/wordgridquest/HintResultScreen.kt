@@ -6,6 +6,7 @@ import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
+import androidx.compose.foundation.layout.navigationBarsPadding
 import androidx.compose.foundation.rememberScrollState
 import androidx.compose.foundation.verticalScroll
 import androidx.compose.material3.Button
@@ -16,6 +17,7 @@ import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
 
@@ -42,8 +44,9 @@ fun HintWordResultScreen(
     Column(
         modifier = Modifier
             .fillMaxSize()
-            .padding(24.dp)
-            .verticalScroll(rememberScrollState()),
+            .navigationBarsPadding()
+            .verticalScroll(rememberScrollState())
+            .padding(horizontal = 20.dp, vertical = 12.dp),
         horizontalAlignment = Alignment.CenterHorizontally
     ) {
         Text(
@@ -52,13 +55,13 @@ fun HintWordResultScreen(
             fontWeight = FontWeight.Bold
         )
 
-        Spacer(modifier = Modifier.height(20.dp))
+        Spacer(modifier = Modifier.height(12.dp))
 
         Card(
             modifier = Modifier.fillMaxWidth()
         ) {
             Column(
-                modifier = Modifier.padding(20.dp),
+                modifier = Modifier.padding(16.dp),
                 horizontalAlignment = Alignment.Start
             ) {
                 Text(text = "模式：${difficulty.title}")
@@ -71,14 +74,14 @@ fun HintWordResultScreen(
             }
         }
 
-        Spacer(modifier = Modifier.height(20.dp))
+        Spacer(modifier = Modifier.height(12.dp))
 
         if (questionResults.isNotEmpty()) {
             Card(
                 modifier = Modifier.fillMaxWidth()
             ) {
                 Column(
-                    modifier = Modifier.padding(20.dp),
+                    modifier = Modifier.padding(16.dp),
                     horizontalAlignment = Alignment.Start
                 ) {
                     Text(
@@ -90,17 +93,13 @@ fun HintWordResultScreen(
                     Spacer(modifier = Modifier.height(12.dp))
 
                     questionResults.forEach { result ->
-                        Text(
-                            text = result,
-                            style = MaterialTheme.typography.bodyMedium
-                        )
-
+                        HintQuestionResultItem(result = result)
                         Spacer(modifier = Modifier.height(6.dp))
                     }
                 }
             }
 
-            Spacer(modifier = Modifier.height(20.dp))
+            Spacer(modifier = Modifier.height(12.dp))
         }
 
         Button(
@@ -110,7 +109,7 @@ fun HintWordResultScreen(
             Text(text = "複製成果")
         }
 
-        Spacer(modifier = Modifier.height(12.dp))
+        Spacer(modifier = Modifier.height(8.dp))
 
         Button(
             onClick = onShareResult,
@@ -119,7 +118,7 @@ fun HintWordResultScreen(
             Text(text = "分享成果")
         }
 
-        Spacer(modifier = Modifier.height(12.dp))
+        Spacer(modifier = Modifier.height(8.dp))
 
         Button(
             onClick = onPlayAgain,
@@ -128,7 +127,7 @@ fun HintWordResultScreen(
             Text(text = "同模式再玩一次")
         }
 
-        Spacer(modifier = Modifier.height(12.dp))
+        Spacer(modifier = Modifier.height(8.dp))
 
         OutlinedButton(
             onClick = onBackToDifficultySelect,
@@ -136,5 +135,27 @@ fun HintWordResultScreen(
         ) {
             Text(text = "返回難度選擇")
         }
+
+        Spacer(modifier = Modifier.height(48.dp))
     }
+}
+
+@Composable
+private fun HintQuestionResultItem(
+    result: String
+) {
+    val textColor = when {
+        "答對" in result -> Color(0xFF2E7D32)
+        "答錯" in result -> Color(0xFFC62828)
+        "跳過" in result -> Color(0xFFF9A825)
+        "時間到" in result -> Color(0xFFEF6C00)
+        else -> MaterialTheme.colorScheme.onSurface
+    }
+
+    Text(
+        text = result,
+        color = textColor,
+        fontWeight = FontWeight.Bold,
+        style = MaterialTheme.typography.bodyMedium
+    )
 }

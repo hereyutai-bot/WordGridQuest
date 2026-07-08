@@ -10,6 +10,35 @@ enum class Screen {
     HELP
 }
 
+enum class GameModeType(
+    val displayName: String
+) {
+    LETTER_TILE(
+        displayName = "模式一：字母牌陣"
+    ),
+    HINT_WORD(
+        displayName = "模式二：提示拼字"
+    )
+}
+
+data class RankingRecord(
+    val playerName: String,
+    val modeType: GameModeType,
+    val score: Int,
+    val detailText: String,
+    val playedAtText: String
+)
+
+data class StudyRecord(
+    val modeType: GameModeType,
+    val score: Int,
+    val correctCount: Int,
+    val wrongCount: Int,
+    val skipCount: Int,
+    val playedAtText: String,
+    val note: String
+)
+
 data class HintWordQuestion(
     val word: String,
     val meaning: String,
