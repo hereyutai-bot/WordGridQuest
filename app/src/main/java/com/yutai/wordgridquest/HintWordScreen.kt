@@ -166,6 +166,10 @@ fun HintWordGameScreen(
     onExitToModeSelect: () -> Unit
 ) {
     var questionIndex by remember { mutableIntStateOf(0) }
+    var questionList by remember {
+        mutableStateOf(hintWordQuestions.shuffled())
+    }
+
     var selectedAnswer by remember { mutableStateOf("") }
     var resultMessage by remember { mutableStateOf("") }
     var score by remember { mutableIntStateOf(0) }
@@ -179,8 +183,8 @@ fun HintWordGameScreen(
         mutableIntStateOf(gameMode.timeLimitSeconds ?: 0)
     }
 
-    val question = hintWordQuestions[questionIndex]
-    val totalQuestions = hintWordQuestions.size
+    val question = questionList[questionIndex]
+    val totalQuestions = questionList.size
     val hasTimer = gameMode.timeLimitSeconds != null
 
     fun markCurrentQuestionAsSkippedByTimeout() {
@@ -231,6 +235,7 @@ fun HintWordGameScreen(
             modeName = gameMode.name,
             onPlayAgainClick = {
                 questionIndex = 0
+                questionList = hintWordQuestions.shuffled()
                 selectedAnswer = ""
                 resultMessage = ""
                 score = 0
