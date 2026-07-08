@@ -1,159 +1,138 @@
 package com.yutai.wordgridquest
 
-import android.content.ClipData
-import android.content.ClipboardManager
-import android.content.Context
 import android.content.Intent
-import android.widget.Toast
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Column
-import androidx.compose.foundation.layout.ExperimentalLayoutApi
 import androidx.compose.foundation.layout.FlowRow
-import androidx.compose.foundation.layout.PaddingValues
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
-import androidx.compose.foundation.layout.size
-import androidx.compose.foundation.shape.CircleShape
-import androidx.compose.foundation.shape.RoundedCornerShape
+import androidx.compose.foundation.rememberScrollState
+import androidx.compose.foundation.verticalScroll
 import androidx.compose.material3.Button
 import androidx.compose.material3.Card
 import androidx.compose.material3.CardDefaults
+import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.OutlinedButton
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableIntStateOf
+import androidx.compose.runtime.mutableStateListOf
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.platform.LocalClipboardManager
 import androidx.compose.ui.platform.LocalContext
+import androidx.compose.ui.text.AnnotatedString
 import androidx.compose.ui.text.font.FontWeight
-import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.unit.dp
-import androidx.compose.ui.unit.sp
 import kotlinx.coroutines.delay
 
-private const val HINT_WORD_QUESTION_COUNT_PER_GAME = 10
-
-data class HintWordGameMode(
-    val name: String,
+private enum class HintGameDifficulty(
+    val title: String,
     val description: String,
-    val timeLimitSeconds: Int?
-)
-
-val hintWordGameModes = listOf(
-    HintWordGameMode(
-        name = "練習模式",
-        description = "不倒數，適合慢慢學習單字。",
-        timeLimitSeconds = null
-    ),
-    HintWordGameMode(
-        name = "挑戰模式",
-        description = "每題 15 秒，適合一般挑戰。",
-        timeLimitSeconds = 15
-    ),
-    HintWordGameMode(
-        name = "快速模式",
-        description = "每題 10 秒，節奏較快。",
-        timeLimitSeconds = 10
-    )
-)
-
-@Composable
-fun HintWordScreen(
-    onBackClick: () -> Unit
+    val secondsPerQuestion: Int?
 ) {
-    var selectedMode by remember { mutableStateOf<HintWordGameMode?>(null) }
-
-    if (selectedMode == null) {
-        HintWordModeSelectScreen(
-            onModeSelected = {
-                selectedMode = it
-            },
-            onBackClick = onBackClick
-        )
-        return
-    }
-
-    HintWordGameScreen(
-        gameMode = selectedMode!!,
-        onBackClick = {
-            selectedMode = null
-        },
-        onExitToModeSelect = onBackClick
+    Practice(
+        title = "練習模式",
+        description = "不倒數，適合熟悉單字",
+        secondsPerQuestion = null
+    ),
+    Challenge(
+        title = "挑戰模式",
+        description = "每題 15 秒",
+        secondsPerQuestion = 15
+    ),
+    Fast(
+        title = "快速模式",
+        description = "每題 10 秒",
+        secondsPerQuestion = 10
     )
 }
 
 @Composable
-fun HintWordModeSelectScreen(
-    onModeSelected: (HintWordGameMode) -> Unit,
-    onBackClick: () -> Unit
+fun HintWordScreen(
+    onBackToModeSelect: () -> Unit
+) {
+    var selectedDifficulty by remember { mutableStateOf<HintGameDifficulty?>(null) }
+
+    if (selectedDifficulty == null) {
+        HintDifficultySelectScreen(
+            onSelectDifficulty = { difficulty ->
+                selectedDifficulty = difficulty
+            },
+            onBackToModeSelect = onBackToModeSelect
+        )
+    } else {
+        HintWordGameScreen(
+            difficulty = selectedDifficulty!!,
+            onBackToDifficultySelect = {
+                selectedDifficulty = null
+            }
+        )
+    }
+}
+
+@Composable
+private fun HintDifficultySelectScreen(
+    onSelectDifficulty: (HintGameDifficulty) -> Unit,
+    onBackToModeSelect: () -> Unit
 ) {
     Column(
         modifier = Modifier
             .fillMaxSize()
             .padding(24.dp),
-        verticalArrangement = Arrangement.Center,
-        horizontalAlignment = Alignment.CenterHorizontally
+        horizontalAlignment = Alignment.CenterHorizontally,
+        verticalArrangement = Arrangement.Center
     ) {
         Text(
-            text = "提示拼字",
-            fontSize = 30.sp,
-            fontWeight = FontWeight.Bold,
-            textAlign = TextAlign.Center
+            text = "模式二：提示拼字",
+            style = MaterialTheme.typography.headlineMedium,
+            fontWeight = FontWeight.Bold
         )
 
-        Spacer(modifier = Modifier.height(8.dp))
+        Spacer(modifier = Modifier.height(12.dp))
 
         Text(
-            text = "選擇遊戲模式",
-            fontSize = 18.sp,
-            textAlign = TextAlign.Center
+            text = "請選擇遊戲難度",
+            style = MaterialTheme.typography.titleMedium
         )
 
-        Spacer(modifier = Modifier.height(24.dp))
+        Spacer(modifier = Modifier.height(32.dp))
 
-        hintWordGameModes.forEach { mode ->
-            Card(
-                onClick = {
-                    onModeSelected(mode)
-                },
-                modifier = Modifier.fillMaxWidth(),
-                shape = RoundedCornerShape(16.dp),
-                elevation = CardDefaults.cardElevation(defaultElevation = 4.dp)
-            ) {
-                Column(
-                    modifier = Modifier.padding(18.dp)
-                ) {
-                    Text(
-                        text = mode.name,
-                        fontSize = 21.sp,
-                        fontWeight = FontWeight.Bold
-                    )
-
-                    Spacer(modifier = Modifier.height(6.dp))
-
-                    Text(
-                        text = mode.description,
-                        fontSize = 15.sp
-                    )
-                }
-            }
-
-            Spacer(modifier = Modifier.height(12.dp))
-        }
+        HintDifficultyButton(
+            title = HintGameDifficulty.Practice.title,
+            description = HintGameDifficulty.Practice.description,
+            onClick = { onSelectDifficulty(HintGameDifficulty.Practice) }
+        )
 
         Spacer(modifier = Modifier.height(16.dp))
 
+        HintDifficultyButton(
+            title = HintGameDifficulty.Challenge.title,
+            description = HintGameDifficulty.Challenge.description,
+            onClick = { onSelectDifficulty(HintGameDifficulty.Challenge) }
+        )
+
+        Spacer(modifier = Modifier.height(16.dp))
+
+        HintDifficultyButton(
+            title = HintGameDifficulty.Fast.title,
+            description = HintGameDifficulty.Fast.description,
+            onClick = { onSelectDifficulty(HintGameDifficulty.Fast) }
+        )
+
+        Spacer(modifier = Modifier.height(32.dp))
+
         OutlinedButton(
-            onClick = onBackClick,
+            onClick = onBackToModeSelect,
             modifier = Modifier.fillMaxWidth()
         ) {
             Text(text = "返回模式選擇")
@@ -162,101 +141,158 @@ fun HintWordModeSelectScreen(
 }
 
 @Composable
-fun HintWordGameScreen(
-    gameMode: HintWordGameMode,
-    onBackClick: () -> Unit,
-    onExitToModeSelect: () -> Unit
+private fun HintDifficultyButton(
+    title: String,
+    description: String,
+    onClick: () -> Unit
 ) {
-    var questionIndex by remember { mutableIntStateOf(0) }
-    var questionList by remember {
-        mutableStateOf(
-            hintWordQuestions
-                .shuffled()
-                .take(HINT_WORD_QUESTION_COUNT_PER_GAME)
-        )
+    Button(
+        onClick = onClick,
+        modifier = Modifier.fillMaxWidth()
+    ) {
+        Column(
+            horizontalAlignment = Alignment.CenterHorizontally
+        ) {
+            Text(
+                text = title,
+                style = MaterialTheme.typography.titleMedium,
+                fontWeight = FontWeight.Bold
+            )
+
+            Text(
+                text = description,
+                style = MaterialTheme.typography.bodyMedium
+            )
+        }
+    }
+}
+
+@Composable
+private fun HintWordGameScreen(
+    difficulty: HintGameDifficulty,
+    onBackToDifficultySelect: () -> Unit
+) {
+    val context = LocalContext.current
+    val clipboardManager = LocalClipboardManager.current
+
+    var gameQuestions by remember {
+        mutableStateOf(hintWordQuestions.shuffled().take(10))
     }
 
+    var currentIndex by remember { mutableIntStateOf(0) }
     var selectedAnswer by remember { mutableStateOf("") }
-    var resultMessage by remember { mutableStateOf("") }
+
     var score by remember { mutableIntStateOf(0) }
     var correctCount by remember { mutableIntStateOf(0) }
     var wrongCount by remember { mutableIntStateOf(0) }
     var skipCount by remember { mutableIntStateOf(0) }
-    var hasAnswered by remember { mutableStateOf(false) }
-    var showResult by remember { mutableStateOf(false) }
+
+    var isAnswered by remember { mutableStateOf(false) }
+    var isGameFinished by remember { mutableStateOf(false) }
     var isPaused by remember { mutableStateOf(false) }
-    var remainingSeconds by remember {
-        mutableIntStateOf(gameMode.timeLimitSeconds ?: 0)
+
+    var answerFeedback by remember { mutableStateOf("") }
+
+    var timeLeft by remember {
+        mutableIntStateOf(difficulty.secondsPerQuestion ?: 0)
     }
 
-    val question = questionList[questionIndex]
-    val totalQuestions = questionList.size
-    val hasTimer = gameMode.timeLimitSeconds != null
-
-    fun markCurrentQuestionAsSkippedByTimeout() {
-        selectedAnswer = "-"
-        resultMessage =
-            "時間到！正確答案是 ${question.missingAnswer}，完整單字是 ${question.word}"
-        skipCount += 1
-        hasAnswered = true
-        isPaused = false
+    val questionResults = remember {
+        mutableStateListOf<String>()
     }
 
-    LaunchedEffect(questionIndex, gameMode) {
-        remainingSeconds = gameMode.timeLimitSeconds ?: 0
-    }
+    val totalQuestions = gameQuestions.size
+    val currentQuestion = gameQuestions[currentIndex]
+    val correctAnswer = currentQuestion.missingAnswer.uppercase()
 
-    LaunchedEffect(questionIndex, hasAnswered, showResult, gameMode, isPaused) {
-        if (hasTimer && !showResult && !hasAnswered && !isPaused) {
-            while (
-                remainingSeconds > 0 &&
-                !hasAnswered &&
-                !showResult &&
-                !isPaused
-            ) {
+    LaunchedEffect(
+        currentIndex,
+        isPaused,
+        isAnswered,
+        isGameFinished,
+        difficulty
+    ) {
+        val seconds = difficulty.secondsPerQuestion
+
+        if (
+            seconds != null &&
+            !isPaused &&
+            !isAnswered &&
+            !isGameFinished
+        ) {
+            while (timeLeft > 0 && !isPaused && !isAnswered && !isGameFinished) {
                 delay(1000)
-                remainingSeconds -= 1
+                timeLeft -= 1
             }
 
-            if (
-                remainingSeconds <= 0 &&
-                !hasAnswered &&
-                !showResult &&
-                !isPaused
-            ) {
-                markCurrentQuestionAsSkippedByTimeout()
+            if (timeLeft == 0 && !isAnswered && !isGameFinished) {
+                isAnswered = true
+                skipCount += 1
+                answerFeedback = "時間到！正確答案是：$correctAnswer"
+
+                questionResults.add(
+                    "第 ${currentIndex + 1} 題：時間到，答案：$correctAnswer"
+                )
             }
         }
     }
 
-    if (showResult) {
-        GameResultScreen(
-            result = GameResult(
-                score = score,
-                correctCount = correctCount,
-                wrongCount = wrongCount,
-                skipCount = skipCount,
-                totalQuestions = totalQuestions
-            ),
-            modeName = gameMode.name,
-            onPlayAgainClick = {
-                questionIndex = 0
-                questionList = hintWordQuestions
-                    .shuffled()
-                    .take(HINT_WORD_QUESTION_COUNT_PER_GAME)
+    if (isGameFinished) {
+        HintWordResultScreen(
+            difficulty = difficulty,
+            score = score,
+            totalQuestions = totalQuestions,
+            correctCount = correctCount,
+            wrongCount = wrongCount,
+            skipCount = skipCount,
+            questionResults = questionResults,
+            onPlayAgain = {
+                gameQuestions = hintWordQuestions.shuffled().take(10)
+                currentIndex = 0
                 selectedAnswer = ""
-                resultMessage = ""
                 score = 0
                 correctCount = 0
                 wrongCount = 0
                 skipCount = 0
-                hasAnswered = false
-                showResult = false
+                isAnswered = false
+                isGameFinished = false
                 isPaused = false
-                remainingSeconds = gameMode.timeLimitSeconds ?: 0
+                answerFeedback = ""
+                timeLeft = difficulty.secondsPerQuestion ?: 0
+                questionResults.clear()
             },
-            onBackClick = onBackClick,
-            onExitToModeSelect = onExitToModeSelect
+            onBackToDifficultySelect = onBackToDifficultySelect,
+            onCopyResult = {
+                val resultText = buildHintResultText(
+                    difficulty = difficulty,
+                    score = score,
+                    totalQuestions = totalQuestions,
+                    correctCount = correctCount,
+                    wrongCount = wrongCount,
+                    skipCount = skipCount
+                )
+
+                clipboardManager.setText(AnnotatedString(resultText))
+            },
+            onShareResult = {
+                val resultText = buildHintResultText(
+                    difficulty = difficulty,
+                    score = score,
+                    totalQuestions = totalQuestions,
+                    correctCount = correctCount,
+                    wrongCount = wrongCount,
+                    skipCount = skipCount
+                )
+
+                val sendIntent = Intent().apply {
+                    action = Intent.ACTION_SEND
+                    putExtra(Intent.EXTRA_TEXT, resultText)
+                    type = "text/plain"
+                }
+
+                val shareIntent = Intent.createChooser(sendIntent, "分享成果")
+                context.startActivity(shareIntent)
+            }
         )
         return
     }
@@ -264,302 +300,279 @@ fun HintWordGameScreen(
     Column(
         modifier = Modifier
             .fillMaxSize()
-            .padding(24.dp),
-        verticalArrangement = Arrangement.Center,
+            .padding(18.dp)
+            .verticalScroll(rememberScrollState()),
         horizontalAlignment = Alignment.CenterHorizontally
     ) {
         Text(
-            text = "提示拼字",
-            fontSize = 30.sp,
-            fontWeight = FontWeight.Bold,
-            textAlign = TextAlign.Center
-        )
-
-        Spacer(modifier = Modifier.height(6.dp))
-
-        Text(
-            text = gameMode.name,
-            fontSize = 16.sp,
+            text = "模式二：提示拼字",
+            style = MaterialTheme.typography.headlineSmall,
             fontWeight = FontWeight.Bold
         )
 
         Spacer(modifier = Modifier.height(6.dp))
 
         Text(
-            text = "第 ${questionIndex + 1} / $totalQuestions 題",
-            fontSize = 16.sp
-        )
-
-        Spacer(modifier = Modifier.height(6.dp))
-
-        Text(
-            text = when {
-                isPaused -> "遊戲已暫停"
-                hasTimer -> "剩餘時間：$remainingSeconds 秒"
-                else -> "練習模式：不倒數"
-            },
-            fontSize = 18.sp,
-            fontWeight = FontWeight.Bold
+            text = difficulty.title,
+            style = MaterialTheme.typography.titleMedium
         )
 
         Spacer(modifier = Modifier.height(12.dp))
 
-        if (!isPaused && !hasAnswered) {
-            Row(
-                modifier = Modifier.fillMaxWidth(),
-                horizontalArrangement = Arrangement.spacedBy(12.dp)
-            ) {
+        Row(
+            modifier = Modifier.fillMaxWidth(),
+            horizontalArrangement = Arrangement.SpaceEvenly,
+            verticalAlignment = Alignment.CenterVertically
+        ) {
+            Text(
+                text = "第 ${currentIndex + 1} / $totalQuestions 題",
+                style = MaterialTheme.typography.titleMedium
+            )
+
+            Text(
+                text = "分數：$score",
+                style = MaterialTheme.typography.titleMedium
+            )
+        }
+
+        if (difficulty.secondsPerQuestion != null) {
+            Spacer(modifier = Modifier.height(8.dp))
+
+            Text(
+                text = "剩餘時間：$timeLeft 秒",
+                style = MaterialTheme.typography.titleMedium,
+                fontWeight = FontWeight.Bold
+            )
+        }
+
+        Spacer(modifier = Modifier.height(10.dp))
+
+        Row(
+            horizontalArrangement = Arrangement.spacedBy(12.dp)
+        ) {
+            if (difficulty.secondsPerQuestion != null) {
                 Button(
                     onClick = {
-                        isPaused = true
-                    },
-                    modifier = Modifier.weight(1f)
+                        isPaused = !isPaused
+                    }
                 ) {
-                    Text(text = "暫停")
-                }
-
-                OutlinedButton(
-                    onClick = onBackClick,
-                    modifier = Modifier.weight(1f)
-                ) {
-                    Text(text = "離開遊戲")
+                    Text(
+                        text = if (isPaused) {
+                            "繼續遊戲"
+                        } else {
+                            "暫停"
+                        }
+                    )
                 }
             }
 
-            Spacer(modifier = Modifier.height(12.dp))
-        } else {
-            Spacer(modifier = Modifier.height(16.dp))
+            OutlinedButton(
+                onClick = onBackToDifficultySelect
+            ) {
+                Text(text = "離開遊戲")
+            }
+        }
+
+        Spacer(modifier = Modifier.height(20.dp))
+
+        if (isPaused) {
+            Card(
+                modifier = Modifier.fillMaxWidth(),
+                colors = CardDefaults.cardColors(
+                    containerColor = MaterialTheme.colorScheme.surfaceVariant
+                )
+            ) {
+                Column(
+                    modifier = Modifier.padding(24.dp),
+                    horizontalAlignment = Alignment.CenterHorizontally
+                ) {
+                    Text(
+                        text = "遊戲已暫停",
+                        style = MaterialTheme.typography.headlineSmall,
+                        fontWeight = FontWeight.Bold
+                    )
+
+                    Spacer(modifier = Modifier.height(12.dp))
+
+                    Text(
+                        text = "題目、提示與 A-Z 按鈕已隱藏",
+                        style = MaterialTheme.typography.bodyLarge
+                    )
+                }
+            }
+
+            return@Column
         }
 
         Card(
-            modifier = Modifier.fillMaxWidth(),
-            shape = RoundedCornerShape(16.dp),
-            elevation = CardDefaults.cardElevation(defaultElevation = 4.dp)
+            modifier = Modifier.fillMaxWidth()
         ) {
             Column(
-                modifier = Modifier.padding(20.dp),
+                modifier = Modifier.padding(18.dp),
                 horizontalAlignment = Alignment.CenterHorizontally
             ) {
-                if (isPaused) {
-                    Text(
-                        text = "遊戲已暫停",
-                        fontSize = 26.sp,
-                        fontWeight = FontWeight.Bold,
-                        textAlign = TextAlign.Center
-                    )
+                Text(
+                    text = "提示",
+                    style = MaterialTheme.typography.titleMedium,
+                    fontWeight = FontWeight.Bold
+                )
 
-                    Spacer(modifier = Modifier.height(16.dp))
+                Spacer(modifier = Modifier.height(8.dp))
 
-                    Text(
-                        text = "題目已隱藏，請按「繼續遊戲」後作答。",
-                        fontSize = 16.sp,
-                        textAlign = TextAlign.Center
-                    )
-
-                    Spacer(modifier = Modifier.height(20.dp))
-
-                    Button(
-                        onClick = {
-                            isPaused = false
-                        },
-                        modifier = Modifier.fillMaxWidth()
-                    ) {
-                        Text(text = "繼續遊戲")
-                    }
-
-                    Spacer(modifier = Modifier.height(12.dp))
-
-                    OutlinedButton(
-                        onClick = onBackClick,
-                        modifier = Modifier.fillMaxWidth()
-                    ) {
-                        Text(text = "離開遊戲")
-                    }
-                } else {
-                    Text(
-                        text = "提示：${question.meaning}",
-                        fontSize = 22.sp,
-                        fontWeight = FontWeight.Bold
-                    )
-
-                    Spacer(modifier = Modifier.height(18.dp))
-
-                    Text(
-                        text = question.clue,
-                        fontSize = 34.sp,
-                        fontWeight = FontWeight.Bold,
-                        letterSpacing = 4.sp,
-                        textAlign = TextAlign.Center
-                    )
-
-                    Spacer(modifier = Modifier.height(14.dp))
-
-                    Text(
-                        text = "請點選缺少的字母",
-                        fontSize = 16.sp
-                    )
-
-                    Spacer(modifier = Modifier.height(10.dp))
-
-                    Text(
-                        text = if (selectedAnswer.isEmpty()) {
-                            "尚未選擇"
-                        } else {
-                            "目前選擇：$selectedAnswer"
-                        },
-                        fontSize = 18.sp,
-                        fontWeight = FontWeight.Bold
-                    )
-
-                    Spacer(modifier = Modifier.height(16.dp))
-
-                    AlphabetButtonGrid(
-                        selectedAnswer = selectedAnswer,
-                        hasAnswered = hasAnswered,
-                        onLetterClick = { letter ->
-                            if (!hasAnswered) {
-                                selectedAnswer = letter
-
-                                if (letter == question.missingAnswer) {
-                                    resultMessage =
-                                        "答對了！${question.word} = ${question.meaning}"
-                                    score += 10
-                                    correctCount += 1
-                                } else {
-                                    resultMessage =
-                                        "答錯了，正確答案是 ${question.missingAnswer}，完整單字是 ${question.word}"
-                                    wrongCount += 1
-                                }
-
-                                hasAnswered = true
-                            }
-                        }
-                    )
-
-                    Spacer(modifier = Modifier.height(16.dp))
-
-                    OutlinedButton(
-                        onClick = {
-                            selectedAnswer = ""
-                            resultMessage = ""
-                        },
-                        enabled = !hasAnswered,
-                        modifier = Modifier.fillMaxWidth()
-                    ) {
-                        Text(text = "重新作答")
-                    }
-
-                    Spacer(modifier = Modifier.height(12.dp))
-
-                    OutlinedButton(
-                        onClick = {
-                            if (!hasAnswered) {
-                                selectedAnswer = "-"
-                                resultMessage =
-                                    "已跳過此題，正確答案是 ${question.missingAnswer}，完整單字是 ${question.word}"
-                                skipCount += 1
-                                hasAnswered = true
-                            }
-                        },
-                        enabled = !hasAnswered,
-                        modifier = Modifier.fillMaxWidth()
-                    ) {
-                        Text(text = "跳過此題")
-                    }
-
-                    Spacer(modifier = Modifier.height(12.dp))
-
-                    Button(
-                        onClick = {
-                            if (questionIndex < totalQuestions - 1) {
-                                questionIndex += 1
-                                selectedAnswer = ""
-                                resultMessage = ""
-                                hasAnswered = false
-                                isPaused = false
-                                remainingSeconds = gameMode.timeLimitSeconds ?: 0
-                            } else {
-                                showResult = true
-                            }
-                        },
-                        enabled = hasAnswered,
-                        modifier = Modifier.fillMaxWidth()
-                    ) {
-                        Text(
-                            text = if (questionIndex < totalQuestions - 1) {
-                                "下一題"
-                            } else {
-                                "結束遊戲"
-                            }
-                        )
-                    }
-                }
+                Text(
+                    text = currentQuestion.clue,
+                    style = MaterialTheme.typography.bodyLarge
+                )
             }
         }
 
         Spacer(modifier = Modifier.height(20.dp))
 
         Text(
-            text = "分數：$score",
-            fontSize = 20.sp,
+            text = selectedAnswer.ifEmpty { "請用 A-Z 按鈕拼出答案" },
+            style = MaterialTheme.typography.headlineSmall,
             fontWeight = FontWeight.Bold
         )
 
-        Spacer(modifier = Modifier.height(6.dp))
+        Spacer(modifier = Modifier.height(14.dp))
 
-        Text(
-            text = "答對：$correctCount　答錯：$wrongCount　跳過：$skipCount",
-            fontSize = 16.sp
-        )
+        if (!isAnswered) {
+            Row(
+                horizontalArrangement = Arrangement.spacedBy(12.dp)
+            ) {
+                OutlinedButton(
+                    onClick = {
+                        if (selectedAnswer.isNotEmpty()) {
+                            selectedAnswer = selectedAnswer.dropLast(1)
+                        }
+                    },
+                    enabled = selectedAnswer.isNotEmpty()
+                ) {
+                    Text(text = "刪除")
+                }
 
-        Spacer(modifier = Modifier.height(12.dp))
+                OutlinedButton(
+                    onClick = {
+                        selectedAnswer = ""
+                    },
+                    enabled = selectedAnswer.isNotEmpty()
+                ) {
+                    Text(text = "清空")
+                }
+            }
 
-        if (resultMessage.isNotEmpty() && !isPaused) {
-            Text(
-                text = resultMessage,
-                fontSize = 18.sp,
-                textAlign = TextAlign.Center
-            )
-        }
-    }
-}
+            Spacer(modifier = Modifier.height(12.dp))
 
-@OptIn(ExperimentalLayoutApi::class)
-@Composable
-fun AlphabetButtonGrid(
-    selectedAnswer: String,
-    hasAnswered: Boolean,
-    onLetterClick: (String) -> Unit
-) {
-    val alphabetLetters = ('A'..'Z').map { it.toString() }
-
-    FlowRow(
-        modifier = Modifier.fillMaxWidth(),
-        horizontalArrangement = Arrangement.Center,
-        verticalArrangement = Arrangement.spacedBy(8.dp)
-    ) {
-        alphabetLetters.forEach { letter ->
             Button(
                 onClick = {
-                    onLetterClick(letter)
+                    val userAnswer = selectedAnswer.uppercase()
+
+                    if (userAnswer == correctAnswer) {
+                        score += 10
+                        correctCount += 1
+                        answerFeedback = "答對了！+10 分"
+                        questionResults.add(
+                            "第 ${currentIndex + 1} 題：答對，答案：$correctAnswer"
+                        )
+                    } else {
+                        wrongCount += 1
+                        answerFeedback = "答錯了！正確答案是：$correctAnswer"
+                        questionResults.add(
+                            "第 ${currentIndex + 1} 題：答錯，答案：$correctAnswer"
+                        )
+                    }
+
+                    isAnswered = true
                 },
-                enabled = !hasAnswered,
-                shape = CircleShape,
-                contentPadding = PaddingValues(0.dp),
-                modifier = Modifier
-                    .padding(horizontal = 4.dp)
-                    .size(42.dp)
+                enabled = selectedAnswer.isNotBlank(),
+                modifier = Modifier.fillMaxWidth()
+            ) {
+                Text(text = "送出答案")
+            }
+
+            Spacer(modifier = Modifier.height(8.dp))
+
+            OutlinedButton(
+                onClick = {
+                    skipCount += 1
+                    isAnswered = true
+                    answerFeedback = "已跳過，正確答案是：$correctAnswer"
+
+                    questionResults.add(
+                        "第 ${currentIndex + 1} 題：跳過，答案：$correctAnswer"
+                    )
+                },
+                modifier = Modifier.fillMaxWidth()
+            ) {
+                Text(text = "跳過此題")
+            }
+
+            Spacer(modifier = Modifier.height(16.dp))
+
+            FlowRow(
+                modifier = Modifier.fillMaxWidth(),
+                horizontalArrangement = Arrangement.Center,
+                verticalArrangement = Arrangement.spacedBy(8.dp)
+            ) {
+                ('A'..'Z').forEach { letter ->
+                    Button(
+                        onClick = {
+                            selectedAnswer += letter
+                        },
+                        modifier = Modifier.padding(3.dp)
+                    ) {
+                        Text(text = letter.toString())
+                    }
+                }
+            }
+        } else {
+            Card(
+                modifier = Modifier.fillMaxWidth(),
+                colors = CardDefaults.cardColors(
+                    containerColor = MaterialTheme.colorScheme.secondaryContainer
+                )
+            ) {
+                Column(
+                    modifier = Modifier.padding(16.dp),
+                    horizontalAlignment = Alignment.CenterHorizontally
+                ) {
+                    Text(
+                        text = answerFeedback,
+                        style = MaterialTheme.typography.titleMedium,
+                        fontWeight = FontWeight.Bold
+                    )
+
+                    Spacer(modifier = Modifier.height(6.dp))
+
+                    Text(
+                        text = "本題已結束",
+                        style = MaterialTheme.typography.bodyMedium
+                    )
+                }
+            }
+
+            Spacer(modifier = Modifier.height(20.dp))
+
+            Button(
+                onClick = {
+                    if (currentIndex == totalQuestions - 1) {
+                        isGameFinished = true
+                    } else {
+                        currentIndex += 1
+                        selectedAnswer = ""
+                        isAnswered = false
+                        answerFeedback = ""
+                        timeLeft = difficulty.secondsPerQuestion ?: 0
+                    }
+                },
+                modifier = Modifier.fillMaxWidth()
             ) {
                 Text(
-                    text = letter,
-                    fontSize = 16.sp,
-                    fontWeight = if (selectedAnswer == letter) {
-                        FontWeight.Bold
+                    text = if (currentIndex == totalQuestions - 1) {
+                        "查看結果"
                     } else {
-                        FontWeight.SemiBold
-                    },
-                    textAlign = TextAlign.Center,
-                    maxLines = 1
+                        "下一題"
+                    }
                 )
             }
         }
@@ -567,69 +580,91 @@ fun AlphabetButtonGrid(
 }
 
 @Composable
-fun GameResultScreen(
-    result: GameResult,
-    modeName: String,
-    onPlayAgainClick: () -> Unit,
-    onBackClick: () -> Unit,
-    onExitToModeSelect: () -> Unit
+private fun HintWordResultScreen(
+    difficulty: HintGameDifficulty,
+    score: Int,
+    totalQuestions: Int,
+    correctCount: Int,
+    wrongCount: Int,
+    skipCount: Int,
+    questionResults: List<String>,
+    onPlayAgain: () -> Unit,
+    onBackToDifficultySelect: () -> Unit,
+    onCopyResult: () -> Unit,
+    onShareResult: () -> Unit
 ) {
-    val context = LocalContext.current
-    val accuracy = if (result.totalQuestions > 0) {
-        result.correctCount * 100 / result.totalQuestions
-    } else {
+    val accuracy = if (totalQuestions == 0) {
         0
+    } else {
+        correctCount * 100 / totalQuestions
     }
-
-    val shareText = buildShareText(
-        modeName = modeName,
-        score = result.score,
-        correctCount = result.correctCount,
-        wrongCount = result.wrongCount,
-        skipCount = result.skipCount,
-        totalQuestions = result.totalQuestions,
-        accuracy = accuracy
-    )
 
     Column(
         modifier = Modifier
             .fillMaxSize()
-            .padding(24.dp),
-        verticalArrangement = Arrangement.Center,
+            .padding(24.dp)
+            .verticalScroll(rememberScrollState()),
         horizontalAlignment = Alignment.CenterHorizontally
     ) {
         Text(
             text = "遊戲結果",
-            fontSize = 30.sp,
+            style = MaterialTheme.typography.headlineMedium,
             fontWeight = FontWeight.Bold
         )
 
-        Spacer(modifier = Modifier.height(24.dp))
+        Spacer(modifier = Modifier.height(20.dp))
 
         Card(
-            modifier = Modifier.fillMaxWidth(),
-            shape = RoundedCornerShape(16.dp),
-            elevation = CardDefaults.cardElevation(defaultElevation = 4.dp)
+            modifier = Modifier.fillMaxWidth()
         ) {
             Column(
-                modifier = Modifier.padding(20.dp)
+                modifier = Modifier.padding(20.dp),
+                horizontalAlignment = Alignment.Start
             ) {
-                ResultTextRow(label = "模式", value = "提示拼字 - $modeName")
-                ResultTextRow(label = "分數", value = result.score.toString())
-                ResultTextRow(label = "總題數", value = "${result.totalQuestions} 題")
-                ResultTextRow(label = "答對", value = "${result.correctCount} 題")
-                ResultTextRow(label = "答錯", value = "${result.wrongCount} 題")
-                ResultTextRow(label = "跳過", value = "${result.skipCount} 題")
-                ResultTextRow(label = "正確率", value = "$accuracy%")
+                Text(text = "模式：${difficulty.title}")
+                Text(text = "分數：$score")
+                Text(text = "總題數：$totalQuestions")
+                Text(text = "答對：$correctCount")
+                Text(text = "答錯：$wrongCount")
+                Text(text = "跳過：$skipCount")
+                Text(text = "正確率：$accuracy%")
             }
         }
 
-        Spacer(modifier = Modifier.height(24.dp))
+        Spacer(modifier = Modifier.height(20.dp))
+
+        if (questionResults.isNotEmpty()) {
+            Card(
+                modifier = Modifier.fillMaxWidth()
+            ) {
+                Column(
+                    modifier = Modifier.padding(20.dp),
+                    horizontalAlignment = Alignment.Start
+                ) {
+                    Text(
+                        text = "本場題目回顧",
+                        style = MaterialTheme.typography.titleMedium,
+                        fontWeight = FontWeight.Bold
+                    )
+
+                    Spacer(modifier = Modifier.height(12.dp))
+
+                    questionResults.forEach { result ->
+                        Text(
+                            text = result,
+                            style = MaterialTheme.typography.bodyMedium
+                        )
+
+                        Spacer(modifier = Modifier.height(6.dp))
+                    }
+                }
+            }
+
+            Spacer(modifier = Modifier.height(20.dp))
+        }
 
         Button(
-            onClick = {
-                copyTextToClipboard(context, shareText)
-            },
+            onClick = onCopyResult,
             modifier = Modifier.fillMaxWidth()
         ) {
             Text(text = "複製成果")
@@ -638,9 +673,7 @@ fun GameResultScreen(
         Spacer(modifier = Modifier.height(12.dp))
 
         Button(
-            onClick = {
-                shareResult(context, shareText)
-            },
+            onClick = onShareResult,
             modifier = Modifier.fillMaxWidth()
         ) {
             Text(text = "分享成果")
@@ -648,8 +681,8 @@ fun GameResultScreen(
 
         Spacer(modifier = Modifier.height(12.dp))
 
-        OutlinedButton(
-            onClick = onPlayAgainClick,
+        Button(
+            onClick = onPlayAgain,
             modifier = Modifier.fillMaxWidth()
         ) {
             Text(text = "同模式再玩一次")
@@ -658,77 +691,36 @@ fun GameResultScreen(
         Spacer(modifier = Modifier.height(12.dp))
 
         OutlinedButton(
-            onClick = onBackClick,
+            onClick = onBackToDifficultySelect,
             modifier = Modifier.fillMaxWidth()
         ) {
             Text(text = "返回難度選擇")
         }
-
-        Spacer(modifier = Modifier.height(12.dp))
-
-        OutlinedButton(
-            onClick = onExitToModeSelect,
-            modifier = Modifier.fillMaxWidth()
-        ) {
-            Text(text = "返回模式選擇")
-        }
     }
 }
 
-fun buildShareText(
-    modeName: String,
+private fun buildHintResultText(
+    difficulty: HintGameDifficulty,
     score: Int,
+    totalQuestions: Int,
     correctCount: Int,
     wrongCount: Int,
-    skipCount: Int,
-    totalQuestions: Int,
-    accuracy: Int
+    skipCount: Int
 ): String {
-    return """
-        我剛完成 Word Grid Quest 英文單字挑戰！
-
-        模式：提示拼字 - $modeName
-        分數：$score
-        總題數：$totalQuestions 題
-        答對：$correctCount 題
-        答錯：$wrongCount 題
-        跳過：$skipCount 題
-        正確率：$accuracy%
-
-        一起來挑戰英文單字吧！
-        #WordGridQuest #英文學習 #單字遊戲
-    """.trimIndent()
-}
-
-fun copyTextToClipboard(
-    context: Context,
-    text: String
-) {
-    val clipboard = context.getSystemService(Context.CLIPBOARD_SERVICE) as ClipboardManager
-    val clip = ClipData.newPlainText("WordGridQuestResult", text)
-    clipboard.setPrimaryClip(clip)
-
-    Toast.makeText(
-        context,
-        "成果已複製",
-        Toast.LENGTH_SHORT
-    ).show()
-}
-
-fun shareResult(
-    context: Context,
-    text: String
-) {
-    val sendIntent = Intent().apply {
-        action = Intent.ACTION_SEND
-        putExtra(Intent.EXTRA_TEXT, text)
-        type = "text/plain"
+    val accuracy = if (totalQuestions == 0) {
+        0
+    } else {
+        correctCount * 100 / totalQuestions
     }
 
-    val shareIntent = Intent.createChooser(
-        sendIntent,
-        "分享成果"
-    )
-
-    context.startActivity(shareIntent)
+    return """
+        Word Grid Quest 模式二：提示拼字
+        模式：${difficulty.title}
+        分數：$score
+        總題數：$totalQuestions
+        答對：$correctCount
+        答錯：$wrongCount
+        跳過：$skipCount
+        正確率：$accuracy%
+    """.trimIndent()
 }

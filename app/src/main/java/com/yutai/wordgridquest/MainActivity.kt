@@ -84,7 +84,7 @@ fun WordGridQuestApp() {
         )
 
         Screen.HINT_WORD -> HintWordScreen(
-            onBackClick = { currentScreen = Screen.MODE_SELECT }
+            onBackToModeSelect = { currentScreen = Screen.MODE_SELECT }
         )
 
         Screen.RANKING -> SimplePageScreen(
