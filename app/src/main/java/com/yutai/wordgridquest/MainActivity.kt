@@ -41,7 +41,8 @@ fun WordGridQuestApp() {
         Screen.HOME -> HomeScreen(
             onStartClick = { currentScreen = Screen.MODE_SELECT },
             onRankingClick = { currentScreen = Screen.RANKING },
-            onStudyRecordClick = { currentScreen = Screen.STUDY_RECORD }
+            onStudyRecordClick = { currentScreen = Screen.STUDY_RECORD },
+            onHelpClick = { currentScreen = Screen.HELP }
         )
 
         Screen.MODE_SELECT -> ModeSelectScreen(
@@ -67,6 +68,10 @@ fun WordGridQuestApp() {
         Screen.STUDY_RECORD -> SimplePageScreen(
             title = "學習紀錄",
             content = "學習紀錄將保存遊玩次數、錯誤單字、完成關卡與學習進度。\n\n目前尚未儲存資料。",
+            onBackClick = { currentScreen = Screen.HOME }
+        )
+
+        Screen.HELP -> GameHelpScreen(
             onBackClick = { currentScreen = Screen.HOME }
         )
     }

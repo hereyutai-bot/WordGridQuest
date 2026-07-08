@@ -22,7 +22,8 @@ import androidx.compose.ui.unit.sp
 fun HomeScreen(
     onStartClick: () -> Unit,
     onRankingClick: () -> Unit,
-    onStudyRecordClick: () -> Unit
+    onStudyRecordClick: () -> Unit,
+    onHelpClick: () -> Unit
 ) {
     Column(
         modifier = Modifier
@@ -53,6 +54,15 @@ fun HomeScreen(
             modifier = Modifier.fillMaxWidth()
         ) {
             Text(text = "開始遊戲")
+        }
+
+        Spacer(modifier = Modifier.height(12.dp))
+
+        OutlinedButton(
+            onClick = onHelpClick,
+            modifier = Modifier.fillMaxWidth()
+        ) {
+            Text(text = "遊戲說明")
         }
 
         Spacer(modifier = Modifier.height(12.dp))

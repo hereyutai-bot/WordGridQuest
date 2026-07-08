@@ -6,7 +6,8 @@ enum class Screen {
     LETTER_TILE,
     HINT_WORD,
     RANKING,
-    STUDY_RECORD
+    STUDY_RECORD,
+    HELP
 }
 
 data class HintWordQuestion(
@@ -15,6 +16,7 @@ data class HintWordQuestion(
     val clue: String,
     val missingAnswer: String
 )
+
 data class GameResult(
     val score: Int,
     val correctCount: Int,
