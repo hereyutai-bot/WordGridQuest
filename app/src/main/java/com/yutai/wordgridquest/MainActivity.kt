@@ -43,6 +43,9 @@ import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import androidx.compose.ui.zIndex
 import com.yutai.wordgridquest.ui.theme.WordGridQuestTheme
+import androidx.compose.foundation.rememberScrollState
+import androidx.compose.foundation.verticalScroll
+import androidx.compose.foundation.layout.navigationBarsPadding
 
 class MainActivity : ComponentActivity() {
     override fun onCreate(savedInstanceState: Bundle?) {
@@ -180,8 +183,9 @@ fun LetterTileScreen(
     Column(
         modifier = Modifier
             .fillMaxSize()
-            .padding(14.dp),
-        verticalArrangement = Arrangement.Center,
+            .navigationBarsPadding()
+            .verticalScroll(rememberScrollState())
+            .padding(16.dp),
         horizontalAlignment = Alignment.CenterHorizontally
     ) {
         Text(
@@ -482,6 +486,8 @@ fun LetterTileScreen(
         ) {
             Text(text = "返回模式選擇")
         }
+
+        Spacer(modifier = Modifier.height(24.dp))
     }
 }
 
