@@ -7,7 +7,8 @@ enum class Screen {
     HINT_WORD,
     RANKING,
     STUDY_RECORD,
-    HELP
+    HELP,
+    DICTIONARY_CHECK
 }
 
 enum class GameModeType(

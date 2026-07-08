@@ -587,3 +587,139 @@ private fun HelpSectionCard(
         }
     }
 }
+
+@Composable
+fun DictionaryCheckScreen(
+    onBackClick: () -> Unit
+) {
+    val result = checkDictionaryWords()
+
+    Column(
+        modifier = Modifier
+            .fillMaxSize()
+            .navigationBarsPadding()
+            .verticalScroll(rememberScrollState())
+            .padding(24.dp),
+        horizontalAlignment = Alignment.CenterHorizontally
+    ) {
+        Text(
+            text = "字典檢查報告",
+            fontSize = 30.sp,
+            fontWeight = FontWeight.Bold,
+            textAlign = TextAlign.Center
+        )
+
+        Spacer(modifier = Modifier.height(20.dp))
+
+        DictionaryCheckSummaryCard(
+            title = "總單字數",
+            content = "${result.totalCount} 筆"
+        )
+
+        Spacer(modifier = Modifier.height(12.dp))
+
+        DictionaryCheckListCard(
+            title = "重複單字",
+            items = result.duplicateWords
+        )
+
+        Spacer(modifier = Modifier.height(12.dp))
+
+        DictionaryCheckListCard(
+            title = "過短單字（少於 3 字母）",
+            items = result.tooShortWords
+        )
+
+        Spacer(modifier = Modifier.height(12.dp))
+
+        DictionaryCheckListCard(
+            title = "中文意思空白",
+            items = result.emptyMeaningWords
+        )
+
+        Spacer(modifier = Modifier.height(12.dp))
+
+        DictionaryCheckListCard(
+            title = "格式錯誤單字（非全大寫 A-Z）",
+            items = result.invalidFormatWords
+        )
+
+        Spacer(modifier = Modifier.height(24.dp))
+
+        OutlinedButton(
+            onClick = onBackClick,
+            modifier = Modifier.fillMaxWidth()
+        ) {
+            Text(text = "返回首頁")
+        }
+
+        Spacer(modifier = Modifier.height(24.dp))
+    }
+}
+
+@Composable
+private fun DictionaryCheckSummaryCard(
+    title: String,
+    content: String
+) {
+    Card(
+        modifier = Modifier.fillMaxWidth(),
+        shape = RoundedCornerShape(16.dp),
+        elevation = CardDefaults.cardElevation(defaultElevation = 3.dp)
+    ) {
+        Column(
+            modifier = Modifier.padding(18.dp)
+        ) {
+            Text(
+                text = title,
+                fontSize = 20.sp,
+                fontWeight = FontWeight.Bold
+            )
+
+            Spacer(modifier = Modifier.height(8.dp))
+
+            Text(
+                text = content,
+                fontSize = 18.sp
+            )
+        }
+    }
+}
+
+@Composable
+private fun DictionaryCheckListCard(
+    title: String,
+    items: List<String>
+) {
+    Card(
+        modifier = Modifier.fillMaxWidth(),
+        shape = RoundedCornerShape(16.dp),
+        elevation = CardDefaults.cardElevation(defaultElevation = 3.dp)
+    ) {
+        Column(
+            modifier = Modifier.padding(18.dp)
+        ) {
+            Text(
+                text = "$title：${items.size}",
+                fontSize = 20.sp,
+                fontWeight = FontWeight.Bold
+            )
+
+            Spacer(modifier = Modifier.height(8.dp))
+
+            if (items.isEmpty()) {
+                Text(
+                    text = "無異常",
+                    fontSize = 16.sp
+                )
+            } else {
+                items.forEach { word ->
+                    Text(
+                        text = "- $word",
+                        fontSize = 16.sp
+                    )
+                }
+            }
+        }
+    }
+}

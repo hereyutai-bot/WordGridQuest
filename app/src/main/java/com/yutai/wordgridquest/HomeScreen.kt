@@ -23,7 +23,8 @@ fun HomeScreen(
     onStartClick: () -> Unit,
     onRankingClick: () -> Unit,
     onStudyRecordClick: () -> Unit,
-    onHelpClick: () -> Unit
+    onHelpClick: () -> Unit,
+    onDictionaryCheckClick: () -> Unit
 ) {
     Column(
         modifier = Modifier
@@ -63,6 +64,15 @@ fun HomeScreen(
             modifier = Modifier.fillMaxWidth()
         ) {
             Text(text = "遊戲說明")
+        }
+
+        Spacer(modifier = Modifier.height(12.dp))
+
+        OutlinedButton(
+            onClick = onDictionaryCheckClick,
+            modifier = Modifier.fillMaxWidth()
+        ) {
+            Text(text = "字典檢查")
         }
 
         Spacer(modifier = Modifier.height(12.dp))
