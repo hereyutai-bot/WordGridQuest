@@ -48,6 +48,22 @@ fun WordGridQuestApp() {
         mutableStateOf(RecordStorage.loadStudyRecords(context))
     }
 
+    fun keepTop10RankingRecords(
+        records: List<RankingRecord>
+    ): List<RankingRecord> {
+        val letterTileTop10 = records
+            .filter { it.modeType == GameModeType.LETTER_TILE }
+            .sortedByDescending { it.score }
+            .take(10)
+
+        val hintWordTop10 = records
+            .filter { it.modeType == GameModeType.HINT_WORD }
+            .sortedByDescending { it.score }
+            .take(10)
+
+        return letterTileTop10 + hintWordTop10
+    }
+
     fun addLetterTileRecord(result: LetterTileGameResult) {
         val playedAtText = RecordStorage.currentPlayedAtText()
 
@@ -69,7 +85,10 @@ fun WordGridQuestApp() {
             note = "已消除 ${result.removedTileCount} 張，剩餘 ${result.remainingTileCount} 張"
         )
 
-        val newRankingRecords = rankingRecords + rankingRecord
+        val newRankingRecords = keepTop10RankingRecords(
+            records = rankingRecords + rankingRecord
+        )
+
         val newStudyRecords = studyRecords + studyRecord
 
         rankingRecords = newRankingRecords
@@ -100,7 +119,10 @@ fun WordGridQuestApp() {
             note = "總題數 ${result.totalQuestions} 題"
         )
 
-        val newRankingRecords = rankingRecords + rankingRecord
+        val newRankingRecords = keepTop10RankingRecords(
+            records = rankingRecords + rankingRecord
+        )
+
         val newStudyRecords = studyRecords + studyRecord
 
         rankingRecords = newRankingRecords
